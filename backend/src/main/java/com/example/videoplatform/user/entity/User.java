@@ -44,4 +44,14 @@ public class User extends BaseTimeEntity {
     private UserStatus status = UserStatus.ACTIVE;
 
     private LocalDateTime deletedAt;
+
+    public static User create(String email, String passwordHash, String nickname, String name) {
+        User user = new User();
+        user.email = email;
+        user.passwordHash = passwordHash;
+        user.nickname = nickname;
+        user.name = name;
+        user.status = UserStatus.ACTIVE;
+        return user;
+    }
 }
