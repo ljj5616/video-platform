@@ -54,4 +54,9 @@ public class User extends BaseTimeEntity {
         user.status = UserStatus.ACTIVE;
         return user;
     }
+
+    public void withdraw(LocalDateTime withdrawnAt) {
+        this.status = UserStatus.WITHDRAWN;
+        this.deletedAt = withdrawnAt;
+    }
 }
