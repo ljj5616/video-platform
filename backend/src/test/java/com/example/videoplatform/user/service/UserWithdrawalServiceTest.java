@@ -77,6 +77,6 @@ class UserWithdrawalServiceTest {
     }
 
     private User user() {
-        return User.create("user@example.com", "encoded-password", "nickname", "name");
+        return User.create("user@example.com", "encoded-password", "nickname", "name", "01012345678");
     }
 }

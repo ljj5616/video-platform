@@ -30,7 +30,8 @@ public class UserService {
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 request.nickname(),
-                request.name()
+                request.name(),
+                request.phone()
         );
         return UserSignUpResponse.from(userRepository.save(user));
     }
@@ -41,6 +42,9 @@ public class UserService {
         }
         if (userRepository.existsByNickname(request.nickname())) {
             throw new BusinessException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+        if (userRepository.existsByPhone(request.phone())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_PHONE);
         }
     }
 }

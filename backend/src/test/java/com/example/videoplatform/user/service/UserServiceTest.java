@@ -71,7 +71,18 @@ class UserServiceTest {
         verify(userRepository, never()).save(any());
     }
 
+    @Test
+    void rejectsDuplicatePhone() {
+        UserSignUpRequest request = request();
+        when(userRepository.existsByPhone(request.phone())).thenReturn(true);
+
+        assertThatThrownBy(() -> userService.signUp(request))
+                .isInstanceOfSatisfying(BusinessException.class,
+                        exception -> assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATE_PHONE));
+        verify(userRepository, never()).save(any());
+    }
+
     private UserSignUpRequest request() {
-        return new UserSignUpRequest("user@example.com", "Password123!", "홍길동", "홍길동");
+        return new UserSignUpRequest("user@example.com", "Password123!", "홍길동", "홍길동", "01012345678");
     }
 }

@@ -45,12 +45,13 @@ public class User extends BaseTimeEntity {
 
     private LocalDateTime deletedAt;
 
-    public static User create(String email, String passwordHash, String nickname, String name) {
+    public static User create(String email, String passwordHash, String nickname, String name, String phone) {
         User user = new User();
         user.email = email;
         user.passwordHash = passwordHash;
         user.nickname = nickname;
         user.name = name;
+        user.phone = phone;
         user.status = UserStatus.ACTIVE;
         return user;
     }

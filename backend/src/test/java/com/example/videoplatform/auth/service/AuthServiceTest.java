@@ -102,7 +102,7 @@ class AuthServiceTest {
     }
 
     private User user() {
-        User user = User.create("user@example.com", "encoded-password", "nickname", "name");
+        User user = User.create("user@example.com", "encoded-password", "nickname", "name", "01012345678");
         ReflectionTestUtils.setField(user, "id", 1L);
         return user;
     }
