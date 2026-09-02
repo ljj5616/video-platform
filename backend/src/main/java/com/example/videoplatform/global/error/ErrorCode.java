@@ -20,8 +20,16 @@ public enum ErrorCode {
     INVALID_VERIFICATION_CODE(2203, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
     VERIFICATION_CODE_EXPIRED(2204, HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
     VERIFICATION_ATTEMPT_LIMIT_EXCEEDED(2205, HttpStatus.TOO_MANY_REQUESTS, "인증번호 확인 횟수를 초과했습니다."),
+    PASSWORD_RESET_SEND_LIMIT_EXCEEDED(2301, HttpStatus.TOO_MANY_REQUESTS, "비밀번호 재설정 인증번호 발송 횟수를 초과했습니다."),
+    INVALID_PASSWORD_RESET_CODE(2302, HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
+    PASSWORD_RESET_CODE_EXPIRED(2303, HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
+    PASSWORD_RESET_VERIFY_LIMIT_EXCEEDED(2304, HttpStatus.TOO_MANY_REQUESTS, "인증번호 확인 횟수를 초과했습니다."),
+    INVALID_RESET_TOKEN(2305, HttpStatus.BAD_REQUEST, "유효하지 않은 Reset Token입니다."),
+    EXPIRED_RESET_TOKEN(2306, HttpStatus.BAD_REQUEST, "만료된 Reset Token입니다."),
+    USED_RESET_TOKEN(2307, HttpStatus.BAD_REQUEST, "이미 사용된 Reset Token입니다."),
     INTERNAL_SERVER_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
-    SMS_SEND_FAILED(9001, HttpStatus.SERVICE_UNAVAILABLE, "인증번호 발송에 실패했습니다.");
+    SMS_SEND_FAILED(9001, HttpStatus.SERVICE_UNAVAILABLE, "인증번호 발송에 실패했습니다."),
+    EMAIL_SEND_FAILED(9002, HttpStatus.SERVICE_UNAVAILABLE, "이메일 발송에 실패했습니다.");
 
     private final int code;
     private final HttpStatus status;

@@ -60,4 +60,8 @@ public class User extends BaseTimeEntity {
         this.status = UserStatus.WITHDRAWN;
         this.deletedAt = withdrawnAt;
     }
+
+    public void changePassword(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 }

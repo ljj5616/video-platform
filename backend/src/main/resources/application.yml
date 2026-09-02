@@ -21,6 +21,14 @@ spring:
       password: ${REDIS_PASSWORD:}
       connect-timeout: 2s
       timeout: 2s
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:true}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
 
 jwt:
   secret: ${JWT_SECRET}
@@ -32,6 +40,10 @@ verification:
   send-window-seconds: 3600
   max-send-count: 5
   max-verify-attempts: 5
+
+password-reset:
+  token-expiration-seconds: 600
+  mail-from: ${SMTP_FROM:${SMTP_USERNAME:}}
 
 sms:
   provider: logging
