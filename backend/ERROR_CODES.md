@@ -36,8 +36,16 @@
 | 2203 | INVALID_VERIFICATION_CODE | 400 | 인증번호 형식 또는 값 불일치 |
 | 2204 | VERIFICATION_CODE_EXPIRED | 400 | 인증번호 만료 |
 | 2205 | VERIFICATION_ATTEMPT_LIMIT_EXCEEDED | 429 | 인증번호 확인 횟수 초과 |
+| 2301 | PASSWORD_RESET_SEND_LIMIT_EXCEEDED | 429 | 비밀번호 재설정 인증번호 발송 횟수 초과 |
+| 2302 | INVALID_PASSWORD_RESET_CODE | 400 | 비밀번호 재설정 인증번호 불일치 |
+| 2303 | PASSWORD_RESET_CODE_EXPIRED | 400 | 비밀번호 재설정 인증번호 만료 |
+| 2304 | PASSWORD_RESET_VERIFY_LIMIT_EXCEEDED | 429 | 비밀번호 재설정 인증번호 확인 횟수 초과 |
+| 2305 | INVALID_RESET_TOKEN | 400 | 유효하지 않은 Reset Token |
+| 2306 | EXPIRED_RESET_TOKEN | 400 | 만료된 Reset Token |
+| 2307 | USED_RESET_TOKEN | 400 | 이미 사용된 Reset Token |
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
+| 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |
 
 ## 사용 중단된 코드
 
