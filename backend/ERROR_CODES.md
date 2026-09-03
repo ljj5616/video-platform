@@ -43,6 +43,11 @@
 | 2305 | INVALID_RESET_TOKEN | 400 | 유효하지 않은 Reset Token |
 | 2306 | EXPIRED_RESET_TOKEN | 400 | 만료된 Reset Token |
 | 2307 | USED_RESET_TOKEN | 400 | 이미 사용된 Reset Token |
+| 3001 | INVALID_PAGE_NUMBER | 400 | 페이지 번호 형식 또는 범위 오류 |
+| 3002 | INVALID_PAGE_SIZE | 400 | 페이지 크기 형식 또는 범위 오류 |
+| 3101 | INVALID_VIDEO_ID | 400 | 영상 ID 형식 또는 범위 오류 |
+| 3102 | VIDEO_ACCESS_DENIED | 403 | 영상 조회 권한 없음 |
+| 3103 | VIDEO_NOT_FOUND | 404 | 영상 없음 |
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
 | 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |
