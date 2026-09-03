@@ -8,6 +8,8 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(1003, HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다."),
     INVALID_NICKNAME_FORMAT(1004, HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     INVALID_PHONE_FORMAT(1007, HttpStatus.BAD_REQUEST, "휴대전화 번호 형식이 올바르지 않습니다."),
+    INVALID_PAGE_NUMBER(3001, HttpStatus.BAD_REQUEST, "페이지 번호 형식 또는 범위가 올바르지 않습니다."),
+    INVALID_PAGE_SIZE(3002, HttpStatus.BAD_REQUEST, "페이지 크기 형식 또는 범위가 올바르지 않습니다."),
     INVALID_CREDENTIALS(2001, HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(2002, HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 Refresh Token입니다."),
     INCORRECT_PASSWORD(2003, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
