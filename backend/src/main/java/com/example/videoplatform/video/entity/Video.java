@@ -91,4 +91,8 @@ public class Video extends BaseTimeEntity {
     public void failProcessing() {
         this.status = VideoStatus.FAILED;
     }
+
+    public void delete(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 }
