@@ -1,7 +1,9 @@
 package com.example.videoplatform.video.controller;
 
 import com.example.videoplatform.video.dto.VideoDetailResponse;
+import com.example.videoplatform.video.dto.VideoPlaybackResponse;
 import com.example.videoplatform.video.service.VideoDetailService;
+import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
 import com.example.videoplatform.video.service.VideoSearchService;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,16 @@ public class VideoController {
 
     private final VideoSearchService videoSearchService;
     private final VideoDetailService videoDetailService;
+    private final VideoPlaybackService videoPlaybackService;
 
-    public VideoController(VideoSearchService videoSearchService, VideoDetailService videoDetailService) {
+    public VideoController(
+            VideoSearchService videoSearchService,
+            VideoDetailService videoDetailService,
+            VideoPlaybackService videoPlaybackService
+    ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
+        this.videoPlaybackService = videoPlaybackService;
     }
 
     @GetMapping
@@ -39,5 +47,13 @@ public class VideoController {
             @PathVariable String videoId
     ) {
         return ResponseEntity.ok(videoDetailService.getDetail(userId, videoId));
+    }
+
+    @GetMapping("/{videoId}/playback")
+    public ResponseEntity<VideoPlaybackResponse> getPlayback(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        return ResponseEntity.ok(videoPlaybackService.getPlayback(userId, videoId));
     }
 }
