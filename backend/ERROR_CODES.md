@@ -24,6 +24,13 @@
 | 1003 | INVALID_PASSWORD_FORMAT | 400 | 비밀번호 형식 오류 |
 | 1004 | INVALID_NICKNAME_FORMAT | 400 | 닉네임 형식 오류 |
 | 1007 | INVALID_PHONE_FORMAT | 400 | 휴대전화 번호 형식 오류 |
+| 3201 | UNSUPPORTED_VIDEO_FORMAT | 400 | 지원하지 않는 영상 형식 또는 영상 크기 초과 |
+| 3202 | UNSUPPORTED_THUMBNAIL_FORMAT | 400 | 지원하지 않는 썸네일 형식 또는 썸네일 크기 초과 |
+| 3203 | INVALID_VIDEO_TITLE | 400 | 영상 제목 길이 오류 |
+| 3204 | INVALID_VIDEO_DESCRIPTION | 400 | 영상 설명 길이 오류 |
+| 3205 | INVALID_VIDEO_VISIBILITY | 400 | 지원하지 않는 공개 범위 |
+| 3206 | UPLOAD_SIZE_EXCEEDED | 413 | 전체 업로드 크기 제한 초과 |
+| 4001 | CATEGORY_NOT_FOUND | 404 | 카테고리 없음 |
 | 2001 | INVALID_CREDENTIALS | 401 | 로그인 정보 불일치 |
 | 2002 | INVALID_REFRESH_TOKEN | 401 | Refresh Token 오류 |
 | 2003 | INCORRECT_PASSWORD | 401 | 비밀번호 불일치 |
@@ -52,6 +59,7 @@
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
 | 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |
+| 9003 | FILE_STORAGE_FAILED | 503 | 파일 저장소 처리 실패 |
 
 ## 사용 중단된 코드
 

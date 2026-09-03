@@ -68,4 +68,27 @@ public class Video extends BaseTimeEntity {
     private LocalDateTime publishedAt;
 
     private LocalDateTime deletedAt;
+
+    public Video(User uploader, Category category, String title, String description,
+                 VideoVisibility visibility, String videoUrl, String thumbnailUrl) {
+        this.uploader = uploader;
+        this.category = category;
+        this.title = title;
+        this.description = description;
+        this.visibility = visibility;
+        this.status = VideoStatus.PROCESSING;
+        this.videoUrl = videoUrl;
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void completeProcessing(String videoUrl, Integer durationSeconds) {
+        this.videoUrl = videoUrl;
+        this.durationSeconds = durationSeconds;
+        this.status = VideoStatus.PUBLISHED;
+        this.publishedAt = LocalDateTime.now();
+    }
+
+    public void failProcessing() {
+        this.status = VideoStatus.FAILED;
+    }
 }

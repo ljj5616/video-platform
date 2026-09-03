@@ -29,6 +29,24 @@ spring:
     properties:
       mail.smtp.auth: ${SMTP_AUTH:true}
       mail.smtp.starttls.enable: ${SMTP_STARTTLS:true}
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1035MB
+
+video:
+  upload:
+    max-video-size: 1GB
+    max-thumbnail-size: 10MB
+    default-thumbnail-url: ${DEFAULT_VIDEO_THUMBNAIL_URL:}
+  storage:
+    bucket: ${VIDEO_S3_BUCKET:}
+    region: ${AWS_REGION:ap-northeast-2}
+    endpoint: ${VIDEO_S3_ENDPOINT:}
+    public-base-url: ${VIDEO_PUBLIC_BASE_URL:}
+  ffmpeg:
+    executable: ${FFMPEG_PATH:ffmpeg}
+    ffprobe-executable: ${FFPROBE_PATH:ffprobe}
 
 jwt:
   secret: ${JWT_SECRET}

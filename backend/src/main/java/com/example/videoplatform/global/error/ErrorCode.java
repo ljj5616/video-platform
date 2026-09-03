@@ -8,6 +8,13 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(1003, HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다."),
     INVALID_NICKNAME_FORMAT(1004, HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     INVALID_PHONE_FORMAT(1007, HttpStatus.BAD_REQUEST, "휴대전화 번호 형식이 올바르지 않습니다."),
+    UNSUPPORTED_VIDEO_FORMAT(3201, HttpStatus.BAD_REQUEST, "지원하지 않는 영상 파일 형식이거나 파일 크기를 초과했습니다."),
+    UNSUPPORTED_THUMBNAIL_FORMAT(3202, HttpStatus.BAD_REQUEST, "지원하지 않는 썸네일 파일 형식이거나 파일 크기를 초과했습니다."),
+    INVALID_VIDEO_TITLE(3203, HttpStatus.BAD_REQUEST, "영상 제목 길이가 올바르지 않습니다."),
+    INVALID_VIDEO_DESCRIPTION(3204, HttpStatus.BAD_REQUEST, "영상 설명 길이가 올바르지 않습니다."),
+    INVALID_VIDEO_VISIBILITY(3205, HttpStatus.BAD_REQUEST, "지원하지 않는 공개 범위입니다."),
+    UPLOAD_SIZE_EXCEEDED(3206, HttpStatus.PAYLOAD_TOO_LARGE, "업로드 파일 크기 제한을 초과했습니다."),
+    CATEGORY_NOT_FOUND(4001, HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
     INVALID_PAGE_NUMBER(3001, HttpStatus.BAD_REQUEST, "페이지 번호 형식 또는 범위가 올바르지 않습니다."),
     INVALID_PAGE_SIZE(3002, HttpStatus.BAD_REQUEST, "페이지 크기 형식 또는 범위가 올바르지 않습니다."),
     INVALID_VIDEO_ID(3101, HttpStatus.BAD_REQUEST, "영상 ID 형식 또는 범위가 올바르지 않습니다."),
@@ -35,7 +42,8 @@ public enum ErrorCode {
     USED_RESET_TOKEN(2307, HttpStatus.BAD_REQUEST, "이미 사용된 Reset Token입니다."),
     INTERNAL_SERVER_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
     SMS_SEND_FAILED(9001, HttpStatus.SERVICE_UNAVAILABLE, "인증번호 발송에 실패했습니다."),
-    EMAIL_SEND_FAILED(9002, HttpStatus.SERVICE_UNAVAILABLE, "이메일 발송에 실패했습니다.");
+    EMAIL_SEND_FAILED(9002, HttpStatus.SERVICE_UNAVAILABLE, "이메일 발송에 실패했습니다."),
+    FILE_STORAGE_FAILED(9003, HttpStatus.SERVICE_UNAVAILABLE, "파일 저장소 처리에 실패했습니다.");
 
     private final int code;
     private final HttpStatus status;
