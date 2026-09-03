@@ -48,6 +48,7 @@
 | 3101 | INVALID_VIDEO_ID | 400 | 영상 ID 형식 또는 범위 오류 |
 | 3102 | VIDEO_ACCESS_DENIED | 403 | 영상 조회 권한 없음 |
 | 3103 | VIDEO_NOT_FOUND | 404 | 영상 없음 |
+| 3104 | VIDEO_NOT_READY | 409 | 영상 처리 중 또는 재생 URL 준비 안 됨 |
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
 | 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |
