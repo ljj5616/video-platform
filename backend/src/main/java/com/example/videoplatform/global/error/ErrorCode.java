@@ -21,6 +21,7 @@ public enum ErrorCode {
     VIDEO_ACCESS_DENIED(3102, HttpStatus.FORBIDDEN, "영상 조회 권한이 없습니다."),
     VIDEO_NOT_FOUND(3103, HttpStatus.NOT_FOUND, "영상을 찾을 수 없습니다."),
     VIDEO_NOT_READY(3104, HttpStatus.CONFLICT, "영상이 아직 처리 중이어서 재생할 수 없습니다."),
+    VIDEO_NOT_EDITABLE(3105, HttpStatus.CONFLICT, "영상이 처리 중이어서 수정할 수 없습니다."),
     INVALID_CREDENTIALS(2001, HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(2002, HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 Refresh Token입니다."),
     INCORRECT_PASSWORD(2003, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
