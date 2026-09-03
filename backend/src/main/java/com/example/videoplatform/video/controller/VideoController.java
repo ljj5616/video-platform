@@ -3,6 +3,7 @@ package com.example.videoplatform.video.controller;
 import com.example.videoplatform.video.dto.VideoDetailResponse;
 import com.example.videoplatform.video.dto.VideoPlaybackResponse;
 import com.example.videoplatform.video.service.VideoDetailService;
+import com.example.videoplatform.video.service.VideoDeleteService;
 import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
 import com.example.videoplatform.video.service.VideoSearchService;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,17 +29,20 @@ public class VideoController {
 
     private final VideoSearchService videoSearchService;
     private final VideoDetailService videoDetailService;
+    private final VideoDeleteService videoDeleteService;
     private final VideoPlaybackService videoPlaybackService;
     private final VideoUploadService videoUploadService;
 
     public VideoController(
             VideoSearchService videoSearchService,
             VideoDetailService videoDetailService,
+            VideoDeleteService videoDeleteService,
             VideoPlaybackService videoPlaybackService,
             VideoUploadService videoUploadService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
+        this.videoDeleteService = videoDeleteService;
         this.videoPlaybackService = videoPlaybackService;
         this.videoUploadService = videoUploadService;
     }
@@ -64,6 +69,15 @@ public class VideoController {
             @RequestParam(required = false) String size
     ) {
         return ResponseEntity.ok(videoSearchService.search(keyword, page, size));
+    }
+
+    @DeleteMapping("/{videoId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        videoDeleteService.delete(userId, videoId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{videoId}")
