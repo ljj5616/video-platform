@@ -8,6 +8,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +37,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleUnreadableMessage(HttpMessageNotReadableException exception) {
+        ErrorCode errorCode = ErrorCode.REQUIRED_FIELD_MISSING;
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeException(MaxUploadSizeExceededException exception) {
+        ErrorCode errorCode = ErrorCode.UPLOAD_SIZE_EXCEEDED;
+        return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
+    }
+
+    @ExceptionHandler({MissingServletRequestParameterException.class,
+            MissingServletRequestPartException.class, MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<ErrorResponse> handleMissingOrInvalidRequestValue(Exception exception) {
         ErrorCode errorCode = ErrorCode.REQUIRED_FIELD_MISSING;
         return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.from(errorCode));
     }
