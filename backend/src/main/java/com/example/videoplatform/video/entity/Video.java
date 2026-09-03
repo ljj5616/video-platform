@@ -95,4 +95,17 @@ public class Video extends BaseTimeEntity {
     public void delete(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
+    public void update(String title, String description, Category category,
+                       VideoVisibility visibility, String thumbnailUrl) {
+        if (title != null) this.title = title;
+        if (description != null) this.description = description;
+        if (category != null) this.category = category;
+        if (visibility != null) this.visibility = visibility;
+        if (thumbnailUrl != null) this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void clearDescription() {
+        this.description = null;
+    }
 }

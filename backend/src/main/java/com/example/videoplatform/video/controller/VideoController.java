@@ -8,10 +8,13 @@ import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
 import com.example.videoplatform.video.service.VideoSearchService;
 import com.example.videoplatform.video.dto.VideoUploadResponse;
+import com.example.videoplatform.video.dto.VideoUpdateResponse;
 import com.example.videoplatform.video.service.VideoUploadService;
+import com.example.videoplatform.video.service.VideoUpdateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +35,36 @@ public class VideoController {
     private final VideoDeleteService videoDeleteService;
     private final VideoPlaybackService videoPlaybackService;
     private final VideoUploadService videoUploadService;
+    private final VideoUpdateService videoUpdateService;
 
     public VideoController(
             VideoSearchService videoSearchService,
             VideoDetailService videoDetailService,
             VideoDeleteService videoDeleteService,
             VideoPlaybackService videoPlaybackService,
-            VideoUploadService videoUploadService
+            VideoUploadService videoUploadService,
+            VideoUpdateService videoUpdateService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
         this.videoDeleteService = videoDeleteService;
         this.videoPlaybackService = videoPlaybackService;
         this.videoUploadService = videoUploadService;
+        this.videoUpdateService = videoUpdateService;
+    }
+
+    @PatchMapping(value = "/{videoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<VideoUpdateResponse> update(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long categoryId,
+            @RequestPart(required = false) MultipartFile thumbnailFile,
+            @RequestParam(required = false) String visibility
+    ) {
+        return ResponseEntity.ok(videoUpdateService.update(userId, videoId, title, description,
+                categoryId, thumbnailFile, visibility));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
