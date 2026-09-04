@@ -2,6 +2,8 @@ package com.example.videoplatform.video.controller;
 
 import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
 import com.example.videoplatform.reaction.like.service.VideoLikeService;
+import com.example.videoplatform.report.dto.VideoReportRequest;
+import com.example.videoplatform.report.service.VideoReportService;
 import com.example.videoplatform.video.dto.VideoDetailResponse;
 import com.example.videoplatform.video.dto.VideoPlaybackResponse;
 import com.example.videoplatform.video.service.VideoDetailService;
@@ -18,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,6 +43,7 @@ public class VideoController {
     private final VideoUpdateService videoUpdateService;
     private final VideoLikeService videoLikeService;
     private final BookmarkService bookmarkService;
+    private final VideoReportService videoReportService;
 
     public VideoController(
             VideoSearchService videoSearchService,
@@ -49,7 +53,8 @@ public class VideoController {
             VideoUploadService videoUploadService,
             VideoUpdateService videoUpdateService,
             VideoLikeService videoLikeService,
-            BookmarkService bookmarkService
+            BookmarkService bookmarkService,
+            VideoReportService videoReportService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
@@ -59,6 +64,17 @@ public class VideoController {
         this.videoUpdateService = videoUpdateService;
         this.videoLikeService = videoLikeService;
         this.bookmarkService = bookmarkService;
+        this.videoReportService = videoReportService;
+    }
+
+    @PostMapping("/{videoId}/reports")
+    public ResponseEntity<Void> report(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId,
+            @RequestBody VideoReportRequest request
+    ) {
+        videoReportService.report(userId, videoId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/{videoId}/bookmarks")
