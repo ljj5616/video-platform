@@ -50,4 +50,38 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
             VideoStatus status,
             Pageable pageable
     );
+
+    @EntityGraph(attributePaths = "uploader")
+    @Query(value = """
+            select v
+            from Video v
+            left join WatchHistory watched
+              on watched.video = v and watched.user.id = :userId
+            left join WatchHistory categoryHistory
+              on categoryHistory.video.category = v.category
+             and categoryHistory.user.id = :userId
+            where v.visibility = :visibility
+              and v.status = :status
+              and v.deletedAt is null
+            group by v
+            order by
+              case when watched.id is null then 0 else 1 end,
+              case when count(categoryHistory.id.userId) > 0 then 0 else 1 end,
+              count(categoryHistory.id.userId) desc,
+              v.viewCount desc,
+              v.createdAt desc,
+              v.id desc
+            """, countQuery = """
+            select count(v)
+            from Video v
+            where v.visibility = :visibility
+              and v.status = :status
+              and v.deletedAt is null
+            """)
+    Page<Video> findRecommendations(
+            @Param("userId") Long userId,
+            @Param("visibility") VideoVisibility visibility,
+            @Param("status") VideoStatus status,
+            Pageable pageable
+    );
 }

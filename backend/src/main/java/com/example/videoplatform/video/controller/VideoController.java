@@ -15,6 +15,8 @@ import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
 import com.example.videoplatform.video.service.VideoSearchService;
 import com.example.videoplatform.video.service.VideoCategoryService;
+import com.example.videoplatform.video.dto.VideoRecommendationResponse;
+import com.example.videoplatform.video.service.VideoRecommendationService;
 import com.example.videoplatform.video.dto.VideoUploadResponse;
 import com.example.videoplatform.video.dto.VideoUpdateResponse;
 import com.example.videoplatform.video.service.VideoUploadService;
@@ -42,6 +44,7 @@ public class VideoController {
 
     private final VideoSearchService videoSearchService;
     private final VideoCategoryService videoCategoryService;
+    private final VideoRecommendationService videoRecommendationService;
     private final VideoDetailService videoDetailService;
     private final VideoDeleteService videoDeleteService;
     private final VideoPlaybackService videoPlaybackService;
@@ -55,6 +58,7 @@ public class VideoController {
     public VideoController(
             VideoSearchService videoSearchService,
             VideoCategoryService videoCategoryService,
+            VideoRecommendationService videoRecommendationService,
             VideoDetailService videoDetailService,
             VideoDeleteService videoDeleteService,
             VideoPlaybackService videoPlaybackService,
@@ -67,6 +71,7 @@ public class VideoController {
     ) {
         this.videoSearchService = videoSearchService;
         this.videoCategoryService = videoCategoryService;
+        this.videoRecommendationService = videoRecommendationService;
         this.videoDetailService = videoDetailService;
         this.videoDeleteService = videoDeleteService;
         this.videoPlaybackService = videoPlaybackService;
@@ -85,6 +90,15 @@ public class VideoController {
     ) {
         watchHistoryService.recordView(userId, videoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<VideoRecommendationResponse> getRecommendations(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String size
+    ) {
+        return ResponseEntity.ok(videoRecommendationService.getRecommendations(userId, page, size));
     }
 
     @PutMapping("/{videoId}/progress")
