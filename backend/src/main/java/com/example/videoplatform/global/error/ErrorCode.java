@@ -22,6 +22,8 @@ public enum ErrorCode {
     VIDEO_NOT_FOUND(3103, HttpStatus.NOT_FOUND, "영상을 찾을 수 없습니다."),
     VIDEO_NOT_READY(3104, HttpStatus.CONFLICT, "영상이 아직 처리 중이어서 재생할 수 없습니다."),
     VIDEO_NOT_EDITABLE(3105, HttpStatus.CONFLICT, "영상이 처리 중이어서 수정할 수 없습니다."),
+    VIDEO_ALREADY_LIKED(5001, HttpStatus.CONFLICT, "이미 좋아요를 등록한 영상입니다."),
+    VIDEO_LIKE_NOT_FOUND(5002, HttpStatus.NOT_FOUND, "등록된 좋아요가 없습니다."),
     INVALID_CREDENTIALS(2001, HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(2002, HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 Refresh Token입니다."),
     INCORRECT_PASSWORD(2003, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),

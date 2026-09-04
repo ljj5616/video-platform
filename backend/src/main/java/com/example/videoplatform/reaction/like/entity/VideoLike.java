@@ -32,4 +32,10 @@ public class VideoLike extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "video_id", nullable = false)
     private Video video;
+
+    public VideoLike(User user, Video video) {
+        this.id = new VideoLikeId(user.getId(), video.getId());
+        this.user = user;
+        this.video = video;
+    }
 }

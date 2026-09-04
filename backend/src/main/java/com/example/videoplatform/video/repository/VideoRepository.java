@@ -9,12 +9,18 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import java.util.Optional;
 
 public interface VideoRepository extends JpaRepository<Video, Long> {
 
     @EntityGraph(attributePaths = {"uploader", "category"})
     Optional<Video> findByIdAndDeletedAtIsNull(Long id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select v from Video v where v.id = :id and v.deletedAt is null")
+    Optional<Video> findByIdAndDeletedAtIsNullForUpdate(@Param("id") Long id);
 
     @EntityGraph(attributePaths = "uploader")
     @Query("""

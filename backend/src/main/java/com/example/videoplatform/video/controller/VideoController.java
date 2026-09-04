@@ -1,5 +1,6 @@
 package com.example.videoplatform.video.controller;
 
+import com.example.videoplatform.reaction.like.service.VideoLikeService;
 import com.example.videoplatform.video.dto.VideoDetailResponse;
 import com.example.videoplatform.video.dto.VideoPlaybackResponse;
 import com.example.videoplatform.video.service.VideoDetailService;
@@ -36,6 +37,7 @@ public class VideoController {
     private final VideoPlaybackService videoPlaybackService;
     private final VideoUploadService videoUploadService;
     private final VideoUpdateService videoUpdateService;
+    private final VideoLikeService videoLikeService;
 
     public VideoController(
             VideoSearchService videoSearchService,
@@ -43,7 +45,8 @@ public class VideoController {
             VideoDeleteService videoDeleteService,
             VideoPlaybackService videoPlaybackService,
             VideoUploadService videoUploadService,
-            VideoUpdateService videoUpdateService
+            VideoUpdateService videoUpdateService,
+            VideoLikeService videoLikeService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
@@ -51,6 +54,25 @@ public class VideoController {
         this.videoPlaybackService = videoPlaybackService;
         this.videoUploadService = videoUploadService;
         this.videoUpdateService = videoUpdateService;
+        this.videoLikeService = videoLikeService;
+    }
+
+    @PostMapping("/{videoId}/likes")
+    public ResponseEntity<Void> like(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        videoLikeService.like(userId, videoId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{videoId}/likes")
+    public ResponseEntity<Void> unlike(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        videoLikeService.unlike(userId, videoId);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/{videoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
