@@ -42,4 +42,12 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
             @Param("status") VideoStatus status,
             Pageable pageable
     );
+
+    @EntityGraph(attributePaths = "uploader")
+    Page<Video> findByCategory_IdAndVisibilityAndStatusAndDeletedAtIsNull(
+            Long categoryId,
+            VideoVisibility visibility,
+            VideoStatus status,
+            Pageable pageable
+    );
 }
