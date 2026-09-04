@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,7 +22,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "comment_reports")
+@Table(name = "comment_reports", uniqueConstraints =
+        @UniqueConstraint(name = "uk_comment_reports_reporter_comment", columnNames = {"reporter_id", "comment_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentReport extends BaseTimeEntity {
 
@@ -49,4 +51,14 @@ public class CommentReport extends BaseTimeEntity {
     private ReportStatus status = ReportStatus.PENDING;
 
     private LocalDateTime resolvedAt;
+
+    public static CommentReport create(User reporter, Comment comment, ReportReason reason, String description) {
+        CommentReport report = new CommentReport();
+        report.reporter = reporter;
+        report.comment = comment;
+        report.reason = reason;
+        report.description = description;
+        report.status = ReportStatus.PENDING;
+        return report;
+    }
 }
