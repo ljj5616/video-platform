@@ -18,6 +18,10 @@ import com.example.videoplatform.user.repository.UserRepository;
 import com.example.videoplatform.video.entity.Video;
 import com.example.videoplatform.video.repository.VideoRepository;
 import java.util.Optional;
+import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,6 +106,35 @@ class VideoLikeServiceTest {
         when(videoRepository.findByIdAndDeletedAtIsNullForUpdate(152L)).thenReturn(Optional.empty());
 
         assertBusinessError(() -> videoLikeService.like(27L, "152"), ErrorCode.VIDEO_NOT_FOUND);
+    }
+
+    @Test
+    void getsLikesWithDefaultPaging() {
+        when(videoLikeRepository.findByUser_IdOrderByCreatedAtDesc(
+                org.mockito.ArgumentMatchers.eq(27L), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        var response = videoLikeService.getLikes(27L, null, null);
+
+        assertThat(response.content()).isEmpty();
+        assertThat(response.page()).isZero();
+        assertThat(response.size()).isEqualTo(20);
+        verify(videoLikeRepository).findByUser_IdOrderByCreatedAtDesc(
+                27L, PageRequest.of(0, 20));
+    }
+
+    @Test
+    void rejectsInvalidLikePaging() {
+        assertBusinessError(() -> videoLikeService.getLikes(27L, "-1", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> videoLikeService.getLikes(27L, "page", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> videoLikeService.getLikes(27L, null, "0"),
+                ErrorCode.INVALID_PAGE_SIZE);
+        assertBusinessError(() -> videoLikeService.getLikes(27L, null, "101"),
+                ErrorCode.INVALID_PAGE_SIZE);
+        assertBusinessError(() -> videoLikeService.getLikes(27L, null, "size"),
+                ErrorCode.INVALID_PAGE_SIZE);
     }
 
     private void assertBusinessError(Runnable action, ErrorCode expected) {
