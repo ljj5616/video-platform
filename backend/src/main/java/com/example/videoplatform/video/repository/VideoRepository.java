@@ -22,7 +22,7 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
     @Query("select v from Video v where v.id = :id and v.deletedAt is null")
     Optional<Video> findByIdAndDeletedAtIsNullForUpdate(@Param("id") Long id);
 
-    @EntityGraph(attributePaths = "uploader")
+    @EntityGraph(attributePaths = {"uploader", "category"})
     @Query("""
             select v
             from Video v
@@ -43,7 +43,31 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
             Pageable pageable
     );
 
-    @EntityGraph(attributePaths = "uploader")
+    @EntityGraph(attributePaths = {"uploader", "category"})
+    @Query("""
+            select v
+            from Video v
+            join v.uploader u
+            where v.visibility = :visibility
+              and v.status = :status
+              and v.deletedAt is null
+              and (:categoryId is null or v.category.id = :categoryId)
+              and (
+                    :keyword is null
+                    or lower(v.title) like :keyword escape '\\'
+                    or lower(v.description) like :keyword escape '\\'
+                    or lower(u.nickname) like :keyword escape '\\'
+              )
+            """)
+    Page<Video> filter(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            @Param("visibility") VideoVisibility visibility,
+            @Param("status") VideoStatus status,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"uploader", "category"})
     Page<Video> findByCategory_IdAndVisibilityAndStatusAndDeletedAtIsNull(
             Long categoryId,
             VideoVisibility visibility,

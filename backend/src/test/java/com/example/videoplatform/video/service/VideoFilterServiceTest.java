@@ -8,8 +8,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.videoplatform.category.repository.CategoryRepository;
 import com.example.videoplatform.category.entity.Category;
+import com.example.videoplatform.category.repository.CategoryRepository;
 import com.example.videoplatform.global.error.BusinessException;
 import com.example.videoplatform.global.error.ErrorCode;
 import com.example.videoplatform.user.entity.User;
@@ -30,56 +30,70 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-class VideoCategoryServiceTest {
+class VideoFilterServiceTest {
 
     @Mock VideoRepository videoRepository;
     @Mock CategoryRepository categoryRepository;
-    private VideoCategoryService service;
+    private VideoFilterService service;
 
     @BeforeEach
     void setUp() {
-        service = new VideoCategoryService(videoRepository, categoryRepository);
+        service = new VideoFilterService(videoRepository, categoryRepository);
     }
 
     @Test
-    void getsPublishedPublicVideosInCategoryWithDefaults() {
+    void combinesKeywordCategoryAndPopularSort() {
         Video video = video();
         when(categoryRepository.existsById(3L)).thenReturn(true);
-        when(videoRepository.findByCategory_IdAndVisibilityAndStatusAndDeletedAtIsNull(
-                eq(3L), eq(VideoVisibility.PUBLIC), eq(VideoStatus.PUBLISHED), any(Pageable.class)))
+        when(videoRepository.filter(eq("%스프링%"), eq(3L), eq(VideoVisibility.PUBLIC),
+                eq(VideoStatus.PUBLISHED), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(video), PageRequest.of(0, 20), 1));
 
-        var response = service.getByCategory("3", null, null);
+        var response = service.filter(" 스프링 ", "3", "POPULAR", null, null);
 
-        assertThat(response.content()).hasSize(1);
-        assertThat(response.content().get(0).videoId()).isEqualTo(152L);
-        assertThat(response.page()).isZero();
-        assertThat(response.size()).isEqualTo(20);
+        assertThat(response.content().get(0).categoryId()).isEqualTo(3L);
+        assertThat(response.content().get(0).categoryName()).isEqualTo("교육");
         ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
-        verify(videoRepository).findByCategory_IdAndVisibilityAndStatusAndDeletedAtIsNull(
-                eq(3L), eq(VideoVisibility.PUBLIC), eq(VideoStatus.PUBLISHED), pageable.capture());
+        verify(videoRepository).filter(eq("%스프링%"), eq(3L), eq(VideoVisibility.PUBLIC),
+                eq(VideoStatus.PUBLISHED), pageable.capture());
+        assertThat(pageable.getValue().getSort().toString()).isEqualTo("viewCount: DESC,id: DESC");
+    }
+
+    @Test
+    void listsAllVideosWithLatestSortByDefault() {
+        when(videoRepository.filter(eq(null), eq(null), any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        service.filter(null, null, null, null, null);
+
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(videoRepository).filter(eq(null), eq(null), eq(VideoVisibility.PUBLIC),
+                eq(VideoStatus.PUBLISHED), pageable.capture());
         assertThat(pageable.getValue().getSort().toString()).isEqualTo("createdAt: DESC,id: DESC");
     }
 
     @Test
-    void rejectsMissingOrInvalidCategoryId() {
-        assertBusinessError(() -> service.getByCategory(null, null, null), ErrorCode.REQUIRED_FIELD_MISSING);
-        assertBusinessError(() -> service.getByCategory("category", null, null), ErrorCode.INVALID_CATEGORY_ID);
-        assertBusinessError(() -> service.getByCategory("0", null, null), ErrorCode.INVALID_CATEGORY_ID);
-        verify(videoRepository, never()).findByCategory_IdAndVisibilityAndStatusAndDeletedAtIsNull(
-                any(), any(), any(), any());
+    void rejectsUnsupportedSort() {
+        assertBusinessError(() -> service.filter(null, null, "RANDOM", null, null),
+                ErrorCode.INVALID_VIDEO_SORT);
+        verify(videoRepository, never()).filter(any(), any(), any(), any(), any());
     }
 
     @Test
-    void rejectsUnknownCategory() {
+    void rejectsInvalidOrUnknownCategory() {
+        assertBusinessError(() -> service.filter(null, "category", null, null, null),
+                ErrorCode.INVALID_CATEGORY_ID);
         when(categoryRepository.existsById(3L)).thenReturn(false);
-        assertBusinessError(() -> service.getByCategory("3", null, null), ErrorCode.CATEGORY_NOT_FOUND);
+        assertBusinessError(() -> service.filter(null, "3", null, null, null),
+                ErrorCode.CATEGORY_NOT_FOUND);
     }
 
     @Test
     void rejectsInvalidPaging() {
-        assertBusinessError(() -> service.getByCategory("3", "-1", null), ErrorCode.INVALID_PAGE_NUMBER);
-        assertBusinessError(() -> service.getByCategory("3", null, "101"), ErrorCode.INVALID_PAGE_SIZE);
+        assertBusinessError(() -> service.filter(null, null, null, "-1", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> service.filter(null, null, null, null, "101"),
+                ErrorCode.INVALID_PAGE_SIZE);
     }
 
     private void assertBusinessError(Runnable action, ErrorCode expected) {
@@ -92,7 +106,7 @@ class VideoCategoryServiceTest {
         User uploader = org.mockito.Mockito.mock(User.class);
         Category category = org.mockito.Mockito.mock(Category.class);
         when(video.getId()).thenReturn(152L);
-        when(video.getTitle()).thenReturn("자바 입문 강의");
+        when(video.getTitle()).thenReturn("스프링 부트 입문 강의");
         when(video.getThumbnailUrl()).thenReturn("https://example.com/thumbnails/152.jpg");
         when(video.getCategory()).thenReturn(category);
         when(category.getId()).thenReturn(3L);

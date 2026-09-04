@@ -52,6 +52,25 @@ class VideoRecommendationRepositoryTest {
                 unwatchedPreferred.getId(), unwatchedOther.getId(), watchedPreferred.getId());
     }
 
+    @Test
+    void filtersByKeywordAndCategoryAndSortsByPopularity() {
+        User user = userRepository.save(User.create(
+                "filter@example.com", "password", "필터사용자", "필터 사용자", null));
+        Category category = categoryRepository.save(category("필터 카테고리"));
+        Video lessPopular = videoRepository.save(video(user, category, "스프링 기초", 1));
+        Video morePopular = videoRepository.save(video(user, category, "스프링 심화", 20));
+        videoRepository.save(video(user, category, "자바 기초", 100));
+
+        var result = videoRepository.filter("%스프링%", category.getId(), VideoVisibility.PUBLIC,
+                VideoStatus.PUBLISHED, PageRequest.of(0, 20,
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Order.desc("viewCount"),
+                                org.springframework.data.domain.Sort.Order.desc("id"))));
+
+        assertThat(result.getContent()).extracting(Video::getId)
+                .containsExactly(morePopular.getId(), lessPopular.getId());
+    }
+
     private Category category(String name) {
         Category category = BeanUtils.instantiateClass(Category.class);
         ReflectionTestUtils.setField(category, "name", name);

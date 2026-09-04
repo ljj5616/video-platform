@@ -13,8 +13,7 @@ import com.example.videoplatform.video.service.VideoDetailService;
 import com.example.videoplatform.video.service.VideoDeleteService;
 import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
-import com.example.videoplatform.video.service.VideoSearchService;
-import com.example.videoplatform.video.service.VideoCategoryService;
+import com.example.videoplatform.video.service.VideoFilterService;
 import com.example.videoplatform.video.dto.VideoRecommendationResponse;
 import com.example.videoplatform.video.service.VideoRecommendationService;
 import com.example.videoplatform.video.dto.VideoUploadResponse;
@@ -42,8 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/videos")
 public class VideoController {
 
-    private final VideoSearchService videoSearchService;
-    private final VideoCategoryService videoCategoryService;
+    private final VideoFilterService videoFilterService;
     private final VideoRecommendationService videoRecommendationService;
     private final VideoDetailService videoDetailService;
     private final VideoDeleteService videoDeleteService;
@@ -56,8 +54,7 @@ public class VideoController {
     private final WatchHistoryService watchHistoryService;
 
     public VideoController(
-            VideoSearchService videoSearchService,
-            VideoCategoryService videoCategoryService,
+            VideoFilterService videoFilterService,
             VideoRecommendationService videoRecommendationService,
             VideoDetailService videoDetailService,
             VideoDeleteService videoDeleteService,
@@ -69,8 +66,7 @@ public class VideoController {
             VideoReportService videoReportService,
             WatchHistoryService watchHistoryService
     ) {
-        this.videoSearchService = videoSearchService;
-        this.videoCategoryService = videoCategoryService;
+        this.videoFilterService = videoFilterService;
         this.videoRecommendationService = videoRecommendationService;
         this.videoDetailService = videoDetailService;
         this.videoDeleteService = videoDeleteService;
@@ -190,13 +186,11 @@ public class VideoController {
     public ResponseEntity<VideoSearchResponse> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String sort,
             @RequestParam(required = false) String page,
             @RequestParam(required = false) String size
     ) {
-        if (categoryId != null) {
-            return ResponseEntity.ok(videoCategoryService.getByCategory(categoryId, page, size));
-        }
-        return ResponseEntity.ok(videoSearchService.search(keyword, page, size));
+        return ResponseEntity.ok(videoFilterService.filter(keyword, categoryId, sort, page, size));
     }
 
     @DeleteMapping("/{videoId}")
