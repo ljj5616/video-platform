@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.videoplatform.global.error.BusinessException;
 import com.example.videoplatform.global.error.ErrorCode;
+import com.example.videoplatform.category.entity.Category;
 import com.example.videoplatform.user.entity.User;
 import com.example.videoplatform.video.entity.Video;
 import com.example.videoplatform.video.entity.VideoStatus;
@@ -131,11 +132,15 @@ class VideoSearchServiceTest {
     private Video video() {
         Video video = org.mockito.Mockito.mock(Video.class);
         User uploader = org.mockito.Mockito.mock(User.class);
+        Category category = org.mockito.Mockito.mock(Category.class);
         LocalDateTime createdAt = LocalDateTime.of(2026, 8, 19, 13, 30);
 
         when(video.getId()).thenReturn(152L);
         when(video.getTitle()).thenReturn("귀여운 고양이 모음");
         when(video.getThumbnailUrl()).thenReturn("https://example.com/thumbnails/152.jpg");
+        when(video.getCategory()).thenReturn(category);
+        when(category.getId()).thenReturn(3L);
+        when(category.getName()).thenReturn("동물");
         when(video.getUploader()).thenReturn(uploader);
         when(uploader.getNickname()).thenReturn("냥이TV");
         when(video.getViewCount()).thenReturn(12_540L);

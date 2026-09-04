@@ -19,6 +19,7 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(4001, HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
     INVALID_PAGE_NUMBER(3001, HttpStatus.BAD_REQUEST, "페이지 번호 형식 또는 범위가 올바르지 않습니다."),
     INVALID_PAGE_SIZE(3002, HttpStatus.BAD_REQUEST, "페이지 크기 형식 또는 범위가 올바르지 않습니다."),
+    INVALID_VIDEO_SORT(3003, HttpStatus.BAD_REQUEST, "지원하지 않는 영상 정렬 기준입니다."),
     INVALID_VIDEO_ID(3101, HttpStatus.BAD_REQUEST, "영상 ID 형식 또는 범위가 올바르지 않습니다."),
     VIDEO_ACCESS_DENIED(3102, HttpStatus.FORBIDDEN, "영상 조회 권한이 없습니다."),
     VIDEO_NOT_FOUND(3103, HttpStatus.NOT_FOUND, "영상을 찾을 수 없습니다."),
