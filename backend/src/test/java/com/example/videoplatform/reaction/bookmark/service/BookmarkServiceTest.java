@@ -18,6 +18,10 @@ import com.example.videoplatform.user.repository.UserRepository;
 import com.example.videoplatform.video.entity.Video;
 import com.example.videoplatform.video.repository.VideoRepository;
 import java.util.Optional;
+import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -99,6 +103,31 @@ class BookmarkServiceTest {
 
         assertBusinessError(() -> bookmarkService.add(27L, "152"), ErrorCode.VIDEO_NOT_FOUND);
         assertBusinessError(() -> bookmarkService.remove(27L, "152"), ErrorCode.VIDEO_NOT_FOUND);
+    }
+
+    @Test
+    void getsBookmarksWithDefaultPaging() {
+        when(bookmarkRepository.findByUser_IdOrderByCreatedAtDesc(
+                org.mockito.ArgumentMatchers.eq(27L), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        var response = bookmarkService.getBookmarks(27L, null, null);
+
+        assertThat(response.content()).isEmpty();
+        assertThat(response.page()).isZero();
+        assertThat(response.size()).isEqualTo(20);
+    }
+
+    @Test
+    void rejectsInvalidBookmarkPaging() {
+        assertBusinessError(() -> bookmarkService.getBookmarks(27L, "-1", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> bookmarkService.getBookmarks(27L, "page", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> bookmarkService.getBookmarks(27L, null, "0"),
+                ErrorCode.INVALID_PAGE_SIZE);
+        assertBusinessError(() -> bookmarkService.getBookmarks(27L, null, "101"),
+                ErrorCode.INVALID_PAGE_SIZE);
     }
 
     private void assertBusinessError(Runnable action, ErrorCode expected) {

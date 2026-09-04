@@ -5,6 +5,8 @@ import com.example.videoplatform.user.dto.UserSignUpResponse;
 import com.example.videoplatform.user.dto.UserWithdrawalRequest;
 import com.example.videoplatform.history.dto.WatchHistoryResponse;
 import com.example.videoplatform.history.service.WatchHistoryService;
+import com.example.videoplatform.reaction.bookmark.dto.BookmarkListResponse;
+import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
 import com.example.videoplatform.user.service.UserService;
 import com.example.videoplatform.user.service.UserWithdrawalService;
 import jakarta.validation.Valid;
@@ -27,12 +29,23 @@ public class UserController {
     private final UserService userService;
     private final UserWithdrawalService userWithdrawalService;
     private final WatchHistoryService watchHistoryService;
+    private final BookmarkService bookmarkService;
 
     public UserController(UserService userService, UserWithdrawalService userWithdrawalService,
-                          WatchHistoryService watchHistoryService) {
+                          WatchHistoryService watchHistoryService, BookmarkService bookmarkService) {
         this.userService = userService;
         this.userWithdrawalService = userWithdrawalService;
         this.watchHistoryService = watchHistoryService;
+        this.bookmarkService = bookmarkService;
+    }
+
+    @GetMapping("/me/bookmarks")
+    public ResponseEntity<BookmarkListResponse> getBookmarks(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String size
+    ) {
+        return ResponseEntity.ok(bookmarkService.getBookmarks(userId, page, size));
     }
 
     @PostMapping
