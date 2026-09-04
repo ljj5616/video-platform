@@ -8,6 +8,7 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(1003, HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다."),
     INVALID_NICKNAME_FORMAT(1004, HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     INVALID_PHONE_FORMAT(1007, HttpStatus.BAD_REQUEST, "휴대전화 번호 형식이 올바르지 않습니다."),
+    INVALID_WATCH_POSITION(1005, HttpStatus.BAD_REQUEST, "시청 위치 형식 또는 범위가 올바르지 않습니다."),
     UNSUPPORTED_VIDEO_FORMAT(3201, HttpStatus.BAD_REQUEST, "지원하지 않는 영상 파일 형식이거나 파일 크기를 초과했습니다."),
     UNSUPPORTED_THUMBNAIL_FORMAT(3202, HttpStatus.BAD_REQUEST, "지원하지 않는 썸네일 파일 형식이거나 파일 크기를 초과했습니다."),
     INVALID_VIDEO_TITLE(3203, HttpStatus.BAD_REQUEST, "영상 제목 길이가 올바르지 않습니다."),

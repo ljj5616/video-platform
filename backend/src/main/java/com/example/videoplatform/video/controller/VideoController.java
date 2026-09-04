@@ -1,6 +1,8 @@
 package com.example.videoplatform.video.controller;
 
 import com.example.videoplatform.history.service.WatchHistoryService;
+import com.example.videoplatform.history.dto.WatchProgressRequest;
+import jakarta.validation.Valid;
 import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
 import com.example.videoplatform.reaction.like.service.VideoLikeService;
 import com.example.videoplatform.report.dto.VideoReportRequest;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +80,16 @@ public class VideoController {
             @PathVariable String videoId
     ) {
         watchHistoryService.recordView(userId, videoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{videoId}/progress")
+    public ResponseEntity<Void> saveProgress(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId,
+            @Valid @RequestBody WatchProgressRequest request
+    ) {
+        watchHistoryService.saveProgress(userId, videoId, request.positionSeconds());
         return ResponseEntity.noContent().build();
     }
 
