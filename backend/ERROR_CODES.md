@@ -60,6 +60,10 @@
 | 5002 | VIDEO_LIKE_NOT_FOUND | 404 | 등록된 좋아요 없음 |
 | 6001 | VIDEO_ALREADY_BOOKMARKED | 409 | 이미 저장 목록에 추가된 영상 |
 | 6002 | VIDEO_BOOKMARK_NOT_FOUND | 404 | 저장 목록에 존재하지 않는 영상 |
+| 7001 | COMMENT_NOT_FOUND | 404 | 댓글 없음 |
+| 7002 | INVALID_COMMENT_CONTENT | 400 | 댓글 내용 길이 오류 |
+| 7003 | INVALID_COMMENT_ID | 400 | 댓글 ID 형식 또는 범위 오류 |
+| 7004 | COMMENT_ACCESS_DENIED | 403 | 댓글 수정 또는 삭제 권한 없음 |
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
 | 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |

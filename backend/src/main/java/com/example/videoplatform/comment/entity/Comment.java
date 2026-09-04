@@ -49,4 +49,20 @@ public class Comment extends BaseTimeEntity {
     private CommentStatus status = CommentStatus.ACTIVE;
 
     private LocalDateTime deletedAt;
+
+    public Comment(Video video, User user, String content) {
+        this.video = video;
+        this.user = user;
+        this.content = content;
+        this.status = CommentStatus.ACTIVE;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void delete(LocalDateTime deletedAt) {
+        this.status = CommentStatus.DELETED;
+        this.deletedAt = deletedAt;
+    }
 }
