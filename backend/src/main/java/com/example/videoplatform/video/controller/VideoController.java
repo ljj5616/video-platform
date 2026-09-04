@@ -14,6 +14,7 @@ import com.example.videoplatform.video.service.VideoDeleteService;
 import com.example.videoplatform.video.service.VideoPlaybackService;
 import com.example.videoplatform.video.dto.VideoSearchResponse;
 import com.example.videoplatform.video.service.VideoSearchService;
+import com.example.videoplatform.video.service.VideoCategoryService;
 import com.example.videoplatform.video.dto.VideoUploadResponse;
 import com.example.videoplatform.video.dto.VideoUpdateResponse;
 import com.example.videoplatform.video.service.VideoUploadService;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class VideoController {
 
     private final VideoSearchService videoSearchService;
+    private final VideoCategoryService videoCategoryService;
     private final VideoDetailService videoDetailService;
     private final VideoDeleteService videoDeleteService;
     private final VideoPlaybackService videoPlaybackService;
@@ -52,6 +54,7 @@ public class VideoController {
 
     public VideoController(
             VideoSearchService videoSearchService,
+            VideoCategoryService videoCategoryService,
             VideoDetailService videoDetailService,
             VideoDeleteService videoDeleteService,
             VideoPlaybackService videoPlaybackService,
@@ -63,6 +66,7 @@ public class VideoController {
             WatchHistoryService watchHistoryService
     ) {
         this.videoSearchService = videoSearchService;
+        this.videoCategoryService = videoCategoryService;
         this.videoDetailService = videoDetailService;
         this.videoDeleteService = videoDeleteService;
         this.videoPlaybackService = videoPlaybackService;
@@ -171,9 +175,13 @@ public class VideoController {
     @GetMapping
     public ResponseEntity<VideoSearchResponse> search(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) String page,
             @RequestParam(required = false) String size
     ) {
+        if (categoryId != null) {
+            return ResponseEntity.ok(videoCategoryService.getByCategory(categoryId, page, size));
+        }
         return ResponseEntity.ok(videoSearchService.search(keyword, page, size));
     }
 
