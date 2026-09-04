@@ -4,6 +4,8 @@ import com.example.videoplatform.comment.dto.CommentPageResponse;
 import com.example.videoplatform.comment.dto.CommentRequest;
 import com.example.videoplatform.comment.dto.CommentResponse;
 import com.example.videoplatform.comment.service.CommentService;
+import com.example.videoplatform.report.dto.CommentReportRequest;
+import com.example.videoplatform.report.service.CommentReportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,9 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentReportService commentReportService;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, CommentReportService commentReportService) {
         this.commentService = commentService;
+        this.commentReportService = commentReportService;
+    }
+
+    @PostMapping("/comments/{commentId}/reports")
+    public ResponseEntity<Void> report(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String commentId,
+            @RequestBody CommentReportRequest request
+    ) {
+        commentReportService.report(userId, commentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/videos/{videoId}/comments")
