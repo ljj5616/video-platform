@@ -32,4 +32,10 @@ public class Bookmark extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "video_id", nullable = false)
     private Video video;
+
+    public Bookmark(User user, Video video) {
+        this.id = new BookmarkId(user.getId(), video.getId());
+        this.user = user;
+        this.video = video;
+    }
 }
