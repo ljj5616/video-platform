@@ -7,6 +7,8 @@ import com.example.videoplatform.history.dto.WatchHistoryResponse;
 import com.example.videoplatform.history.service.WatchHistoryService;
 import com.example.videoplatform.reaction.bookmark.dto.BookmarkListResponse;
 import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
+import com.example.videoplatform.reaction.like.dto.VideoLikeListResponse;
+import com.example.videoplatform.reaction.like.service.VideoLikeService;
 import com.example.videoplatform.user.service.UserService;
 import com.example.videoplatform.user.service.UserWithdrawalService;
 import jakarta.validation.Valid;
@@ -30,13 +32,25 @@ public class UserController {
     private final UserWithdrawalService userWithdrawalService;
     private final WatchHistoryService watchHistoryService;
     private final BookmarkService bookmarkService;
+    private final VideoLikeService videoLikeService;
 
     public UserController(UserService userService, UserWithdrawalService userWithdrawalService,
-                          WatchHistoryService watchHistoryService, BookmarkService bookmarkService) {
+                          WatchHistoryService watchHistoryService, BookmarkService bookmarkService,
+                          VideoLikeService videoLikeService) {
         this.userService = userService;
         this.userWithdrawalService = userWithdrawalService;
         this.watchHistoryService = watchHistoryService;
         this.bookmarkService = bookmarkService;
+        this.videoLikeService = videoLikeService;
+    }
+
+    @GetMapping("/me/likes")
+    public ResponseEntity<VideoLikeListResponse> getLikes(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String size
+    ) {
+        return ResponseEntity.ok(videoLikeService.getLikes(userId, page, size));
     }
 
     @GetMapping("/me/bookmarks")

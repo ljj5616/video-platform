@@ -4,6 +4,8 @@ import com.example.videoplatform.global.error.BusinessException;
 import com.example.videoplatform.global.error.ErrorCode;
 import com.example.videoplatform.reaction.like.entity.VideoLike;
 import com.example.videoplatform.reaction.like.entity.VideoLikeId;
+import com.example.videoplatform.reaction.like.dto.VideoLikeItemResponse;
+import com.example.videoplatform.reaction.like.dto.VideoLikeListResponse;
 import com.example.videoplatform.reaction.like.repository.VideoLikeRepository;
 import com.example.videoplatform.user.entity.User;
 import com.example.videoplatform.user.repository.UserRepository;
@@ -11,10 +13,15 @@ import com.example.videoplatform.video.entity.Video;
 import com.example.videoplatform.video.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 @Transactional(readOnly = true)
 public class VideoLikeService {
+
+    private static final int DEFAULT_PAGE = 0;
+    private static final int DEFAULT_SIZE = 20;
+    private static final int MAX_SIZE = 100;
 
     private final VideoLikeRepository videoLikeRepository;
     private final VideoRepository videoRepository;
@@ -54,6 +61,14 @@ public class VideoLikeService {
         video.decreaseLikeCount();
     }
 
+    public VideoLikeListResponse getLikes(Long userId, String pageValue, String sizeValue) {
+        int page = parsePage(pageValue);
+        int size = parseSize(sizeValue);
+        return VideoLikeListResponse.from(videoLikeRepository
+                .findByUser_IdOrderByCreatedAtDesc(userId, PageRequest.of(page, size))
+                .map(VideoLikeItemResponse::from));
+    }
+
     private Video findVideo(long videoId) {
         return videoRepository.findByIdAndDeletedAtIsNullForUpdate(videoId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.VIDEO_NOT_FOUND));
@@ -66,6 +81,27 @@ public class VideoLikeService {
             return videoId;
         } catch (NumberFormatException exception) {
             throw new BusinessException(ErrorCode.INVALID_VIDEO_ID);
+        }
+    }
+
+    private int parsePage(String value) {
+        int page = parseInteger(value, DEFAULT_PAGE, ErrorCode.INVALID_PAGE_NUMBER);
+        if (page < 0) throw new BusinessException(ErrorCode.INVALID_PAGE_NUMBER);
+        return page;
+    }
+
+    private int parseSize(String value) {
+        int size = parseInteger(value, DEFAULT_SIZE, ErrorCode.INVALID_PAGE_SIZE);
+        if (size < 1 || size > MAX_SIZE) throw new BusinessException(ErrorCode.INVALID_PAGE_SIZE);
+        return size;
+    }
+
+    private int parseInteger(String value, int defaultValue, ErrorCode errorCode) {
+        if (value == null) return defaultValue;
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            throw new BusinessException(errorCode);
         }
     }
 }
