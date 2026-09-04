@@ -1,5 +1,6 @@
 package com.example.videoplatform.video.controller;
 
+import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
 import com.example.videoplatform.reaction.like.service.VideoLikeService;
 import com.example.videoplatform.video.dto.VideoDetailResponse;
 import com.example.videoplatform.video.dto.VideoPlaybackResponse;
@@ -38,6 +39,7 @@ public class VideoController {
     private final VideoUploadService videoUploadService;
     private final VideoUpdateService videoUpdateService;
     private final VideoLikeService videoLikeService;
+    private final BookmarkService bookmarkService;
 
     public VideoController(
             VideoSearchService videoSearchService,
@@ -46,7 +48,8 @@ public class VideoController {
             VideoPlaybackService videoPlaybackService,
             VideoUploadService videoUploadService,
             VideoUpdateService videoUpdateService,
-            VideoLikeService videoLikeService
+            VideoLikeService videoLikeService,
+            BookmarkService bookmarkService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
@@ -55,6 +58,25 @@ public class VideoController {
         this.videoUploadService = videoUploadService;
         this.videoUpdateService = videoUpdateService;
         this.videoLikeService = videoLikeService;
+        this.bookmarkService = bookmarkService;
+    }
+
+    @PostMapping("/{videoId}/bookmarks")
+    public ResponseEntity<Void> addBookmark(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        bookmarkService.add(userId, videoId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{videoId}/bookmarks")
+    public ResponseEntity<Void> removeBookmark(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        bookmarkService.remove(userId, videoId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{videoId}/likes")

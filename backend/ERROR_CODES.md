@@ -56,6 +56,10 @@
 | 3102 | VIDEO_ACCESS_DENIED | 403 | 영상 조회 권한 없음 |
 | 3103 | VIDEO_NOT_FOUND | 404 | 영상 없음 |
 | 3104 | VIDEO_NOT_READY | 409 | 영상 처리 중 또는 재생 URL 준비 안 됨 |
+| 5001 | VIDEO_ALREADY_LIKED | 409 | 이미 좋아요를 등록한 영상 |
+| 5002 | VIDEO_LIKE_NOT_FOUND | 404 | 등록된 좋아요 없음 |
+| 6001 | VIDEO_ALREADY_BOOKMARKED | 409 | 이미 저장 목록에 추가된 영상 |
+| 6002 | VIDEO_BOOKMARK_NOT_FOUND | 404 | 저장 목록에 존재하지 않는 영상 |
 | 9000 | INTERNAL_SERVER_ERROR | 500 | 내부 서버 오류 |
 | 9001 | SMS_SEND_FAILED | 503 | SMS 발송 실패 |
 | 9002 | EMAIL_SEND_FAILED | 503 | 이메일 발송 실패 |
