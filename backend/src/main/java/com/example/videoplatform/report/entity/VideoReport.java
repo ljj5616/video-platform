@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,7 +22,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "video_reports")
+@Table(name = "video_reports", uniqueConstraints =
+        @UniqueConstraint(name = "uk_video_reports_reporter_video", columnNames = {"reporter_id", "video_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoReport extends BaseTimeEntity {
 
@@ -49,4 +51,14 @@ public class VideoReport extends BaseTimeEntity {
     private ReportStatus status = ReportStatus.PENDING;
 
     private LocalDateTime resolvedAt;
+
+    public static VideoReport create(User reporter, Video video, ReportReason reason, String description) {
+        VideoReport report = new VideoReport();
+        report.reporter = reporter;
+        report.video = video;
+        report.reason = reason;
+        report.description = description;
+        report.status = ReportStatus.PENDING;
+        return report;
+    }
 }

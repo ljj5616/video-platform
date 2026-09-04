@@ -2,10 +2,9 @@ package com.example.videoplatform.report.entity;
 
 public enum ReportReason {
     SPAM,
-    HARASSMENT,
+    INAPPROPRIATE,
+    HATE_SPEECH,
     VIOLENCE,
-    SEXUAL_CONTENT,
     COPYRIGHT,
-    MISINFORMATION,
     OTHER
 }
