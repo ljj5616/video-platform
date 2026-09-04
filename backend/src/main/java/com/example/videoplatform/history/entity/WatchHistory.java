@@ -68,4 +68,14 @@ public class WatchHistory {
         this.viewCounted = true;
         return true;
     }
+
+    public void updateProgress(int positionSeconds, LocalDateTime watchedAt) {
+        this.positionSeconds = positionSeconds;
+        this.lastWatchedAt = watchedAt;
+        if (video.getDurationSeconds() != null && positionSeconds >= video.getDurationSeconds()) {
+            this.completedAt = watchedAt;
+        } else {
+            this.completedAt = null;
+        }
+    }
 }

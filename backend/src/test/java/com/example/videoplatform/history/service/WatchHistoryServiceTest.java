@@ -21,6 +21,8 @@ import com.example.videoplatform.video.entity.VideoStatus;
 import com.example.videoplatform.video.entity.VideoVisibility;
 import com.example.videoplatform.video.repository.VideoRepository;
 import java.util.Optional;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,6 +100,61 @@ class WatchHistoryServiceTest {
         when(videoRepository.findByIdAndDeletedAtIsNullForUpdate(152L)).thenReturn(Optional.empty());
         assertBusinessError(() -> watchHistoryService.recordView(27L, "152"),
                 ErrorCode.VIDEO_NOT_FOUND);
+    }
+
+    @Test
+    void getsHistoryWithDefaultPaging() {
+        when(watchHistoryRepository.findByUser_IdOrderByLastWatchedAtDesc(
+                org.mockito.ArgumentMatchers.eq(27L), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(java.util.List.of()));
+
+        var response = watchHistoryService.getHistory(27L, null, null);
+
+        assertThat(response.content()).isEmpty();
+        assertThat(response.page()).isZero();
+    }
+
+    @Test
+    void rejectsInvalidHistoryPaging() {
+        assertBusinessError(() -> watchHistoryService.getHistory(27L, "-1", null),
+                ErrorCode.INVALID_PAGE_NUMBER);
+        assertBusinessError(() -> watchHistoryService.getHistory(27L, null, "101"),
+                ErrorCode.INVALID_PAGE_SIZE);
+    }
+
+    @Test
+    void updatesExistingProgress() {
+        Video video = viewableVideo();
+        WatchHistory history = mock(WatchHistory.class);
+        when(video.getDurationSeconds()).thenReturn(634);
+        when(videoRepository.findByIdAndDeletedAtIsNull(152L)).thenReturn(Optional.of(video));
+        when(watchHistoryRepository.findById(new WatchHistoryId(27L, 152L)))
+                .thenReturn(Optional.of(history));
+
+        watchHistoryService.saveProgress(27L, "152", 285L);
+
+        verify(history).updateProgress(org.mockito.ArgumentMatchers.eq(285), any());
+    }
+
+    @Test
+    void rejectsProgressBeyondVideoDuration() {
+        Video video = viewableVideo();
+        when(video.getDurationSeconds()).thenReturn(634);
+        when(videoRepository.findByIdAndDeletedAtIsNull(152L)).thenReturn(Optional.of(video));
+
+        assertBusinessError(() -> watchHistoryService.saveProgress(27L, "152", 635L),
+                ErrorCode.INVALID_WATCH_POSITION);
+        verify(watchHistoryRepository, never()).findById(any());
+    }
+
+    @Test
+    void deletingMissingHistoryIsIdempotent() {
+        WatchHistoryId id = new WatchHistoryId(27L, 152L);
+        when(watchHistoryRepository.existsById(id)).thenReturn(false);
+
+        watchHistoryService.deleteHistory(27L, "152");
+
+        verify(watchHistoryRepository, never()).deleteById(any());
     }
 
     private Video viewableVideo() {
