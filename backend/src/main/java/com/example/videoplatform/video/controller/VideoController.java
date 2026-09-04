@@ -1,5 +1,6 @@
 package com.example.videoplatform.video.controller;
 
+import com.example.videoplatform.history.service.WatchHistoryService;
 import com.example.videoplatform.reaction.bookmark.service.BookmarkService;
 import com.example.videoplatform.reaction.like.service.VideoLikeService;
 import com.example.videoplatform.report.dto.VideoReportRequest;
@@ -44,6 +45,7 @@ public class VideoController {
     private final VideoLikeService videoLikeService;
     private final BookmarkService bookmarkService;
     private final VideoReportService videoReportService;
+    private final WatchHistoryService watchHistoryService;
 
     public VideoController(
             VideoSearchService videoSearchService,
@@ -54,7 +56,8 @@ public class VideoController {
             VideoUpdateService videoUpdateService,
             VideoLikeService videoLikeService,
             BookmarkService bookmarkService,
-            VideoReportService videoReportService
+            VideoReportService videoReportService,
+            WatchHistoryService watchHistoryService
     ) {
         this.videoSearchService = videoSearchService;
         this.videoDetailService = videoDetailService;
@@ -65,6 +68,16 @@ public class VideoController {
         this.videoLikeService = videoLikeService;
         this.bookmarkService = bookmarkService;
         this.videoReportService = videoReportService;
+        this.watchHistoryService = watchHistoryService;
+    }
+
+    @PostMapping("/{videoId}/views")
+    public ResponseEntity<Void> recordView(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String videoId
+    ) {
+        watchHistoryService.recordView(userId, videoId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{videoId}/reports")

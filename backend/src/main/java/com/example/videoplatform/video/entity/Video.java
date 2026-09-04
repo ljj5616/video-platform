@@ -118,4 +118,8 @@ public class Video extends BaseTimeEntity {
             this.likeCount--;
         }
     }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
 }

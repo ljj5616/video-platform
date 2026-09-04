@@ -50,4 +50,22 @@ public class WatchHistory {
     private LocalDateTime lastWatchedAt;
 
     private LocalDateTime completedAt;
+
+    public WatchHistory(User user, Video video, LocalDateTime watchedAt) {
+        this.id = new WatchHistoryId(user.getId(), video.getId());
+        this.user = user;
+        this.video = video;
+        this.firstWatchedAt = watchedAt;
+        this.lastWatchedAt = watchedAt;
+        this.viewCounted = true;
+    }
+
+    public boolean countView(LocalDateTime watchedAt) {
+        this.lastWatchedAt = watchedAt;
+        if (viewCounted) {
+            return false;
+        }
+        this.viewCounted = true;
+        return true;
+    }
 }
