@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useApi, fromSearch, fromRecommendation, formatDuration } from './api/videos'
 import type { Video, SearchPage, RecommendationPage, Category } from './api/videos'
+import { AuthForm } from './auth/AuthForm'
+import { authRequest, setSession, useSession } from './auth/session'
 import './App.css'
 
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
@@ -20,6 +22,14 @@ function VideoCard({ video }: { video: Video }) {
 }
 
 function App() {
+  const session = useSession()
+  const [route, setRoute] = useState(window.location.hash.slice(1) || '/')
+  const [loggingOut, setLoggingOut] = useState(false)
+  useEffect(() => {
+    const change = () => setRoute(window.location.hash.slice(1) || '/')
+    window.addEventListener('hashchange', change)
+    return () => window.removeEventListener('hashchange', change)
+  }, [])
   const [input, setInput] = useState('')
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('')
@@ -36,8 +46,21 @@ function App() {
   const pageCount = listing.data?.totalPages ?? 0
   const categories = [{ id: '', name: '전체' }, ...(categoryList.data ?? []).map(item => ({ id: String(item.id), name: item.name }))]
   const firstPage = Math.max(1, Math.min(page - 2, pageCount - 4))
+  async function logout() {
+    if (!session || loggingOut) return
+    setLoggingOut(true)
+    try {
+      await authRequest('/auth/logout', 'POST', { refreshToken: session.refreshToken })
+      setSession(null)
+      setNotice('로그아웃되었습니다.')
+      window.location.hash = '/'
+    } catch {
+      setNotice('로그아웃 요청에 실패했습니다. 다시 시도해 주세요.')
+    } finally { setLoggingOut(false) }
+  }
   function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    window.location.hash = '/'
     setQuery(input.trim())
     setPage(1)
   }
@@ -45,18 +68,18 @@ function App() {
   return <>
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
     <header className="site-header"><div className="header-inner">
-      <a className="brand" href="/" aria-label="VIDSHARE 홈"><span className="brand-mark" aria-hidden="true" />VIDSHARE</a>
+      <a className="brand" href="#/" aria-label="VIDSHARE 홈"><span className="brand-mark" aria-hidden="true" />VIDSHARE</a>
       <form className="search" role="search" onSubmit={search}>
         <button type="submit" aria-label="검색"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="10" cy="10" r="6" /><path d="m15 15 5 5" /></svg></button>
         <input aria-label="영상 제목 또는 작성자 검색" placeholder="영상 제목, 작성자 검색..." value={input} onChange={event => setInput(event.target.value)} />
       </form>
       <div className="header-actions">
         <button className="button" onClick={() => setNotice('영상 업로드 화면은 준비 중입니다.')}><span aria-hidden="true">↥</span> 영상 업로드</button>
-        <button className="button primary" onClick={() => setNotice('로그인 화면은 준비 중입니다.')}>로그인</button>
+        {session ? <details className="account-menu"><summary className="button">내 계정</summary><div className="account-actions"><button disabled={loggingOut} onClick={logout}>{loggingOut ? '로그아웃 중…' : '로그아웃'}</button><a href="#/withdraw">회원탈퇴</a></div></details> : <button className="button primary" onClick={() => { window.location.hash = '/login' }}>로그인</button>}
       </div>
     </div></header>
     {notice && <div className="notice" role="status">{notice}<button aria-label="안내 닫기" onClick={() => setNotice('')}>×</button></div>}
-    <main id="main" className="main-content">
+    {route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : <main id="main" className="main-content">
       <section aria-labelledby="recommended-heading">
         <h1 id="recommended-heading" className="section-heading">추천 영상</h1>
         {recommendations.loading ? <p className="request-state" role="status">추천 영상을 불러오는 중입니다…</p> :
@@ -82,8 +105,9 @@ function App() {
           <button aria-label="다음 페이지" disabled={page === pageCount} onClick={() => setPage(page + 1)}>›</button>
         </nav>}
       </section>
-    </main>
+    </main>}
   </>
 }
 
 export default App
+

@@ -1,0 +1,18 @@
+.auth-layout { min-height: calc(100svh - 76px); display: grid; place-items: center; padding: 48px 20px; }
+.auth-card { width: 100%; max-width: 400px; border: 1px solid #d7dce4; background: white; border-radius: 8px; padding: 32px; }
+.auth-card h1 { font-size: 22px; text-align: center; margin-bottom: 28px; }
+.auth-card fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.auth-card label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 18px; }
+.auth-card input:not([type=checkbox]) { display: block; width: 100%; border: 1px solid #d7dce4; border-radius: 5px; padding: 11px; margin-top: 7px; font-size: 14px; background: white; }
+.auth-card input::placeholder { color: #818b9c; }
+.auth-submit { width: 100%; margin-top: 8px; min-height: 42px; }
+.auth-error { color: #c52335; font-size: 13px; margin: 12px 0; }
+.field-help { font-size: 12px; color: #606b7c; margin: -8px 0 18px; }
+.auth-footer { border-top: 1px solid #e7e9ee; margin-top: 24px; padding-top: 16px; text-align: center; font-size: 13px; }
+.auth-footer a { font-weight: 700; text-decoration: underline; }
+.withdraw-warning { line-height: 1.7; margin-bottom: 24px; color: #a02332; font-size: 14px; }
+.auth-card .confirmation { display: flex; align-items: center; gap: 8px; line-height: 1.6; }
+.account-menu { position: relative; }
+.account-menu summary { cursor: pointer; }
+.account-actions { position: absolute; right: 0; top: 44px; z-index: 5; min-width: 160px; padding: 10px; border: 1px solid #d7dce4; background: white; border-radius: 6px; box-shadow: 0 6px 20px #161d2b15; }
+.account-actions a, .account-actions button { display: block; width: 100%; padding: 10px; border: 0; background: white; text-align: left; font-size: 13px; }
