@@ -1,40 +1,17 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useApi, fromSearch, fromRecommendation, formatDuration } from './api/videos'
+import type { Video, SearchPage, RecommendationPage, Category } from './api/videos'
 import './App.css'
 
-const categories = ['전체', '음악', '게임', '교육', '요리', '여행', '기술', '일상']
-const titles = [
-  ['2024년 꼭 알아야 할 인공지능 트렌드 대정리', '테크 인사이트', '기술'],
-  ['초보자를 위한 10분 완성 에스프레소 가이드', '커피 노트', '요리'],
-  ['가장 현실적인 유럽 배낭여행 꿀팁 TOP 5', '여행의 기록', '여행'],
-  ['하루 15분 완성 코어 강화 필라테스 루틴', '헬스데이', '일상'],
-  ['초보 개발자를 위한 깃허브 실전 사용법 총정리', '코딩 마스터', '기술'],
-  ['요즘 유행하는 캠핑 용품 내돈내산 솔직 리뷰', '아웃도어 라이프', '여행'],
-  ['독서가 쉬워지는 미니멀 독서법과 책 추천', '지식의 샘', '교육'],
-  ['직장인을 위한 초간단 5분 아침식사 레시피', '요리왕김셰프', '요리'],
-  ['기타 솔로 초보자 전용 쉬운 연습곡 추천', '음악창고', '음악'],
-  ['고양이의 마음을 읽는 행동 분석 백과사전', '펫케어 TV', '일상'],
-  ['도심 속 힐링 공간, 서울 숨은 북카페 탐방기', '감성골목', '일상'],
-  ['수익형 블로그 개설부터 첫 수익까지의 로드맵', '머니클래스', '교육'],
-  ['세계에서 가장 아름다운 국립공원 자연 다큐멘터리', '에코뷰', '여행'],
-  ['아이패드 프로 생산성 극대화 앱 추천 & 세팅', '디지털 라이프', '기술'],
-  ['처음 시작하는 아늑한 농장 게임 가이드', '슬로우 플레이', '게임'],
-]
-// 화면 확인용 데이터입니다. API 연결 시 서버 응답으로 교체합니다.
-const videos = titles.map(([title, author, category], index) => ({
-  id: index + 1, title, author, category,
-  views: [82000, 34000, 67000, 23000, 11000, 5600, 9200, 12000, 3400, 42000, 7800, 31000, 150000, 25000, 18000][index],
-  duration: ['18:24', '10:08', '15:32', '15:02', '24:16'][index % 5],
-  published: index < 3 ? index : 18 - index,
-}))
-type Video = typeof videos[number]
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
 
 function VideoCard({ video }: { video: Video }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
   return <article className="video-card">
-    <div className="thumbnail" aria-label={video.title + ' 썸네일 준비 중'}>
-      <span className="play-symbol" aria-hidden="true">▶</span>
-      <span className="duration">{video.duration}</span>
+    <div className="thumbnail" aria-label={video.title + ' 썸네일'}>
+      {video.thumbnailUrl && failedUrl !== video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" loading="lazy" onError={() => setFailedUrl(video.thumbnailUrl)} /> : <span className="play-symbol" aria-hidden="true">▶</span>}
+      {video.duration != null && <span className="duration">{formatDuration(video.duration)}</span>}
     </div>
     <h3>{video.title}</h3>
     <p className="author">{video.author}</p>
@@ -45,16 +22,20 @@ function VideoCard({ video }: { video: Video }) {
 function App() {
   const [input, setInput] = useState('')
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('전체')
+  const [category, setCategory] = useState('')
   const [sort, setSort] = useState('latest')
   const [page, setPage] = useState(1)
   const [notice, setNotice] = useState('')
-  const filtered = videos.filter(video =>
-    (category === '전체' || video.category === category) &&
-    (video.title + ' ' + video.author).toLowerCase().includes(query.toLowerCase()),
-  ).sort((a, b) => sort === 'popular' ? b.views - a.views : b.published - a.published)
-  const pageCount = Math.ceil(filtered.length / 12)
-
+  const params = new URLSearchParams({ sort: sort.toUpperCase(), page: String(page - 1), size: '12' })
+  if (query) params.set('keyword', query)
+  if (category) params.set('categoryId', category)
+  const listing = useApi<SearchPage>('/api/v1/videos?' + params)
+  const recommendations = useApi<RecommendationPage>('/api/v1/videos/recommendations?page=0&size=3')
+  const categoryList = useApi<Category[]>('/api/v1/categories')
+  const filtered = listing.data?.content.map(fromSearch) ?? []
+  const pageCount = listing.data?.totalPages ?? 0
+  const categories = [{ id: '', name: '전체' }, ...(categoryList.data ?? []).map(item => ({ id: String(item.id), name: item.name }))]
+  const firstPage = Math.max(1, Math.min(page - 2, pageCount - 4))
   function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setQuery(input.trim())
@@ -78,22 +59,26 @@ function App() {
     <main id="main" className="main-content">
       <section aria-labelledby="recommended-heading">
         <h1 id="recommended-heading" className="section-heading">추천 영상</h1>
-        <div className="video-grid recommended">{videos.slice(0, 3).map(video => <VideoCard key={video.id} video={video} />)}</div>
+        {recommendations.loading ? <p className="request-state" role="status">추천 영상을 불러오는 중입니다…</p> :
+          recommendations.error ? <div className="request-state" role="alert">{recommendations.error} <button className="button" onClick={recommendations.retry}>다시 시도</button></div> :
+          recommendations.data?.content.length ? <div className="video-grid recommended">{recommendations.data.content.map(fromRecommendation).map(video => <VideoCard key={video.id} video={video} />)}</div> :
+          <p className="request-state">아직 추천할 영상이 없습니다.</p>}
       </section>
       <section className="browse" aria-labelledby="browse-heading">
         <h2 id="browse-heading" className="section-heading">영상 탐색</h2>
         <div className="toolbar">
           <div className="categories" role="group" aria-label="카테고리">
-            {categories.map(item => <button key={item} className={category === item ? 'category selected' : 'category'} aria-pressed={category === item} onClick={() => { setCategory(item); setPage(1) }}>{item}</button>)}
+            {categories.map(item => <button key={item.id} className={category === item.id ? 'category selected' : 'category'} aria-pressed={category === item.id} onClick={() => { setCategory(item.id); setPage(1) }}>{item.name}</button>)}
           </div>
           <select aria-label="영상 정렬" value={sort} onChange={event => { setSort(event.target.value); setPage(1) }}><option value="latest">최신순</option><option value="popular">조회수순</option></select>
         </div>
-        {query && <div className="search-summary" role="status">“{query}” 검색 결과 {filtered.length}개 <button onClick={() => { setQuery(''); setInput(''); setPage(1) }}>검색 해제</button></div>}
-        {filtered.length > 0 ? <div className="video-grid">{filtered.slice((page - 1) * 12, page * 12).map(video => <VideoCard key={video.id} video={video} />)}</div> :
-          <div className="empty-state"><h3>검색 결과가 없습니다</h3><p>다른 검색어나 카테고리로 영상을 찾아보세요.</p><button className="button" onClick={() => { setInput(''); setQuery(''); setCategory('전체'); setPage(1) }}>전체 영상 보기</button></div>}
+        {categoryList.error && <div className="request-state" role="alert">카테고리를 불러오지 못했습니다. <button className="button" onClick={categoryList.retry}>다시 시도</button></div>}
+        {query && listing.data && <div className="search-summary" role="status">“{query}” 검색 결과 {listing.data.totalElements}개 <button onClick={() => { setQuery(''); setInput(''); setPage(1) }}>검색 해제</button></div>}
+        {listing.loading ? <p className="request-state" role="status">영상을 불러오는 중입니다…</p> : listing.error ? <div className="request-state" role="alert">{listing.error} <button className="button" onClick={listing.retry}>다시 시도</button></div> : filtered.length > 0 ? <div className="video-grid">{filtered.map(video => <VideoCard key={video.id} video={video} />)}</div> :
+          <div className="empty-state"><h3>{query || category ? '검색 결과가 없습니다' : '아직 등록된 영상이 없습니다'}</h3><p>다른 검색어나 카테고리로 영상을 찾아보세요.</p><button className="button" onClick={() => { setInput(''); setQuery(''); setCategory(''); setPage(1) }}>전체 영상 보기</button></div>}
         {pageCount > 1 && <nav className="pagination" aria-label="영상 목록 페이지">
           <button aria-label="이전 페이지" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</button>
-          {Array.from({ length: pageCount }, (_, index) => index + 1).map(number => <button key={number} aria-label={number + '페이지'} aria-current={page === number ? 'page' : undefined} onClick={() => setPage(number)}>{number}</button>)}
+          {Array.from({ length: Math.min(5, pageCount) }, (_, index) => firstPage + index).map(number => <button key={number} aria-label={number + '페이지'} aria-current={page === number ? 'page' : undefined} onClick={() => setPage(number)}>{number}</button>)}
           <button aria-label="다음 페이지" disabled={page === pageCount} onClick={() => setPage(page + 1)}>›</button>
         </nav>}
       </section>
