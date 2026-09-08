@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getSession, useSession, setSession } from '../auth/session'
 
 export interface Video {
   id: number
@@ -32,7 +33,9 @@ interface RecommendedVideo {
 export interface Category { id: number; name: string }
 
 export async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal, headers: { Accept: 'application/json' } })
+  const current = getSession()
+  const response = await fetch(url, { signal, headers: { Accept: 'application/json', ...(current ? { Authorization: 'Bearer ' + current.accessToken } : {}) } })
+  if (response.status === 401 && current && getSession()?.accessToken === current.accessToken) setSession(null)
   if (!response.ok) {
     throw new Error(response.status === 401
       ? '조회 권한이 없습니다. 로그인 상태를 확인해 주세요.'
@@ -43,7 +46,8 @@ export async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
 
 export function useApi<T>(url: string) {
   const [attempt, setAttempt] = useState(0)
-  const key = url + '#' + attempt
+  const session = useSession()
+  const key = url + '#' + attempt + '#' + (session?.accessToken ?? '')
   const [result, setResult] = useState<{ key: string; data?: T; error?: string }>()
   useEffect(() => {
     const controller = new AbortController()
@@ -82,3 +86,4 @@ export function formatDuration(seconds: number) {
     ? Math.floor(minutes / 60) + ':' + String(minutes % 60).padStart(2, '0') + ':' + String(value % 60).padStart(2, '0')
     : minutes + ':' + String(value % 60).padStart(2, '0')
 }
+
