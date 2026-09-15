@@ -42,3 +42,12 @@ test('failed login presents API error', async () => {
   globalThis.fetch = async () => new Response(JSON.stringify({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' }), { status: 400 })
   await assert.rejects(authRequest('/auth/login', 'POST', {}), /이메일 또는 비밀번호/)
 })
+
+test('reaction and report requests accept empty 201 responses', async () => {
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/v1/videos/152/likes')
+    assert.equal(options.headers.Authorization, 'Bearer access')
+    return new Response(null, { status: 201 })
+  }
+  assert.equal(await authRequest('/videos/152/likes', 'POST', undefined, 'access'), undefined)
+})

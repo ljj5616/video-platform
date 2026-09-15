@@ -37,6 +37,8 @@ export async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(url, { signal, headers: { Accept: 'application/json', ...(current ? { Authorization: 'Bearer ' + current.accessToken } : {}) } })
   if (response.status === 401 && current && getSession()?.accessToken === current.accessToken) setSession(null)
   if (!response.ok) {
+    const error = await response.json().catch(() => null) as { message?: string } | null
+    if (error?.message) throw new Error(error.message)
     throw new Error(response.status === 401
       ? '조회 권한이 없습니다. 로그인 상태를 확인해 주세요.'
       : '데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.')
@@ -44,27 +46,30 @@ export async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
   return response.json() as Promise<T>
 }
 
-export function useApi<T>(url: string) {
+export function useApi<T>(url: string, retainOnRetry = false) {
   const [attempt, setAttempt] = useState(0)
   const session = useSession()
-  const key = url + '#' + attempt + '#' + (session?.accessToken ?? '')
-  const [result, setResult] = useState<{ key: string; data?: T; error?: string }>()
+  const resourceKey = url + '#' + (session?.accessToken ?? '')
+  const key = resourceKey + '#' + attempt
+  const [result, setResult] = useState<{ key: string; resourceKey: string; data?: T; error?: string }>()
   useEffect(() => {
     const controller = new AbortController()
     const timeout = window.setTimeout(() => controller.abort(), 15000)
     let active = true
     getJson<T>(url, controller.signal).then(data => {
-      if (active) setResult({ key, data })
+      if (active) setResult({ key, resourceKey, data })
     }).catch((error: unknown) => {
-      if (active) setResult({ key, error: error instanceof Error && error.name !== 'AbortError'
+      if (active) setResult({ key, resourceKey, error: error instanceof Error && error.name !== 'AbortError'
         ? error.message : '서버 응답이 지연되고 있습니다. 다시 시도해 주세요.' })
     }).finally(() => window.clearTimeout(timeout))
     return () => { active = false; window.clearTimeout(timeout); controller.abort() }
-  }, [url, key])
+  }, [url, key, resourceKey])
+  const reusable = retainOnRetry && result?.resourceKey === resourceKey && result.data !== undefined
   return {
-    data: result?.key === key ? result.data : undefined,
+    data: result?.key === key || reusable ? result?.data : undefined,
     error: result?.key === key ? result.error : undefined,
-    loading: result?.key !== key,
+    loading: result?.key !== key && !reusable,
+    refreshing: result?.key !== key,
     retry: () => setAttempt(value => value + 1),
   }
 }

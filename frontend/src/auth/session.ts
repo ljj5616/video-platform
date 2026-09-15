@@ -44,5 +44,6 @@ export async function authRequest<T>(path: string, method: string, body: unknown
     if (response.status === 401 && token && getSession()?.accessToken === token) setSession(null)
     throw new Error(error?.message ?? '요청에 실패했습니다. 잠시 후 다시 시도해 주세요.')
   }
-  return response.status === 204 ? undefined as T : response.json() as Promise<T>
+  const text = await response.text()
+  return text ? JSON.parse(text) as T : undefined as T
 }
