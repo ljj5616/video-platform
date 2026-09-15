@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useApi, fromSearch, fromRecommendation, formatDuration } from './api/videos'
 import type { Video, SearchPage, RecommendationPage, Category } from './api/videos'
 import { AuthForm } from './auth/AuthForm'
 import { authRequest, setSession, useSession } from './auth/session'
 import './App.css'
+const VideoDetail = lazy(() => import('./video/VideoDetail').then(module => ({ default: module.VideoDetail })))
 
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
 
 function VideoCard({ video }: { video: Video }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
-  return <article className="video-card">
+  return <article className="video-card"><a href={`#/videos/${video.id}`}>
     <div className="thumbnail" aria-label={video.title + ' 썸네일'}>
       {video.thumbnailUrl && failedUrl !== video.thumbnailUrl ? <img src={video.thumbnailUrl} alt="" loading="lazy" onError={() => setFailedUrl(video.thumbnailUrl)} /> : <span className="play-symbol" aria-hidden="true">▶</span>}
       {video.duration != null && <span className="duration">{formatDuration(video.duration)}</span>}
@@ -18,7 +19,7 @@ function VideoCard({ video }: { video: Video }) {
     <h3>{video.title}</h3>
     <p className="author">{video.author}</p>
     <p className="views">조회수 {viewFormatter.format(video.views)}회</p>
-  </article>
+  </a></article>
 }
 
 function App() {
@@ -79,7 +80,7 @@ function App() {
       </div>
     </div></header>
     {notice && <div className="notice" role="status">{notice}<button aria-label="안내 닫기" onClick={() => setNotice('')}>×</button></div>}
-    {route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : <main id="main" className="main-content">
+    {route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : /^\/videos\/[1-9][0-9]*$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">상세 화면을 불러오는 중…</main>}><VideoDetail key={route} id={route.split('/')[2]} /></Suspense> : <main id="main" className="main-content">
       <section aria-labelledby="recommended-heading">
         <h1 id="recommended-heading" className="section-heading">추천 영상</h1>
         {recommendations.loading ? <p className="request-state" role="status">추천 영상을 불러오는 중입니다…</p> :
