@@ -6,6 +6,7 @@ import { AuthForm } from './auth/AuthForm'
 import { authRequest, setSession, useSession } from './auth/session'
 import './App.css'
 const VideoDetail = lazy(() => import('./video/VideoDetail').then(module => ({ default: module.VideoDetail })))
+const VideoUpload = lazy(() => import('./video/VideoUpload').then(module => ({ default: module.VideoUpload })))
 
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
 
@@ -75,12 +76,12 @@ function App() {
         <input aria-label="영상 제목 또는 작성자 검색" placeholder="영상 제목, 작성자 검색..." value={input} onChange={event => setInput(event.target.value)} />
       </form>
       <div className="header-actions">
-        <button className="button" onClick={() => setNotice('영상 업로드 화면은 준비 중입니다.')}><span aria-hidden="true">↥</span> 영상 업로드</button>
+        <a className="button" href="#/upload"><span aria-hidden="true">↥</span> 영상 업로드</a>
         {session ? <details className="account-menu"><summary className="button">내 계정</summary><div className="account-actions"><button disabled={loggingOut} onClick={logout}>{loggingOut ? '로그아웃 중…' : '로그아웃'}</button><a href="#/withdraw">회원탈퇴</a></div></details> : <button className="button primary" onClick={() => { window.location.hash = '/login' }}>로그인</button>}
       </div>
     </div></header>
     {notice && <div className="notice" role="status">{notice}<button aria-label="안내 닫기" onClick={() => setNotice('')}>×</button></div>}
-    {route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : /^\/videos\/[1-9][0-9]*$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">상세 화면을 불러오는 중…</main>}><VideoDetail key={route} id={route.split('/')[2]} /></Suspense> : <main id="main" className="main-content">
+    {route === '/upload' ? <Suspense fallback={<main id="main" className="request-state">업로드 화면을 불러오는 중…</main>}><VideoUpload onUploaded={() => { listing.retry(); recommendations.retry() }} /></Suspense> : route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : /^\/videos\/[1-9][0-9]*$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">상세 화면을 불러오는 중…</main>}><VideoDetail key={route} id={route.split('/')[2]} /></Suspense> : <main id="main" className="main-content">
       <section aria-labelledby="recommended-heading">
         <h1 id="recommended-heading" className="section-heading">추천 영상</h1>
         {recommendations.loading ? <p className="request-state" role="status">추천 영상을 불러오는 중입니다…</p> :
