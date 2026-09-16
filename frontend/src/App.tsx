@@ -7,6 +7,7 @@ import { authRequest, setSession, useSession } from './auth/session'
 import './App.css'
 const VideoDetail = lazy(() => import('./video/VideoDetail').then(module => ({ default: module.VideoDetail })))
 const VideoUpload = lazy(() => import('./video/VideoUpload').then(module => ({ default: module.VideoUpload })))
+const VideoEdit = lazy(() => import('./video/VideoEdit').then(module => ({ default: module.VideoEdit })))
 
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
 
@@ -66,6 +67,12 @@ function App() {
     setQuery(input.trim())
     setPage(1)
   }
+  function videoChanged(message: string) {
+    setNotice(message)
+    setPage(1)
+    listing.retry()
+    recommendations.retry()
+  }
 
   return <>
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
@@ -81,7 +88,7 @@ function App() {
       </div>
     </div></header>
     {notice && <div className="notice" role="status">{notice}<button aria-label="안내 닫기" onClick={() => setNotice('')}>×</button></div>}
-    {route === '/upload' ? <Suspense fallback={<main id="main" className="request-state">업로드 화면을 불러오는 중…</main>}><VideoUpload onUploaded={() => { listing.retry(); recommendations.retry() }} /></Suspense> : route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : /^\/videos\/[1-9][0-9]*$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">상세 화면을 불러오는 중…</main>}><VideoDetail key={route} id={route.split('/')[2]} /></Suspense> : <main id="main" className="main-content">
+    {/^\/videos\/[1-9][0-9]*\/edit$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">수정 화면을 불러오는 중…</main>}><VideoEdit key={route} id={route.split('/')[2]} onSaved={() => videoChanged('영상이 수정되었습니다.')} /></Suspense> : route === '/upload' ? <Suspense fallback={<main id="main" className="request-state">업로드 화면을 불러오는 중…</main>}><VideoUpload onUploaded={() => { listing.retry(); recommendations.retry() }} /></Suspense> : route === '/login' || route === '/signup' || route === '/withdraw' ? <AuthForm key={route} page={route === '/signup' ? 'signup' : route === '/withdraw' && session ? 'withdraw' : 'login'} done={setNotice} /> : /^\/videos\/[1-9][0-9]*$/.test(route) ? <Suspense fallback={<main id="main" className="request-state">상세 화면을 불러오는 중…</main>}><VideoDetail key={route} id={route.split('/')[2]} onDeleted={() => videoChanged('영상이 삭제되었습니다.')} /></Suspense> : <main id="main" className="main-content">
       <section aria-labelledby="recommended-heading">
         <h1 id="recommended-heading" className="section-heading">추천 영상</h1>
         {recommendations.loading ? <p className="request-state" role="status">추천 영상을 불러오는 중입니다…</p> :
