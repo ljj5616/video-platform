@@ -46,3 +46,8 @@
 .video-card > a { display: block; }
 @media (max-width: 1000px) { .detail-layout { padding-inline: 24px; grid-template-columns: minmax(0, 1fr) 250px; } .related-card { grid-template-columns: 100px minmax(0, 1fr); } }
 @media (max-width: 760px) { .detail-layout { grid-template-columns: 1fr; padding: 20px; } .related { padding-top: 0; } .related-card { grid-template-columns: 140px minmax(0, 1fr); } .video-title { font-size: 20px; } }
+.video-owner-actions { display: flex; justify-content: flex-end; gap: 8px; margin: 12px 0; }
+.button.danger { color: #a32424; border-color: #e3b9b9; background: #fff; }
+.video-delete-confirm { border: 1px solid #e3b9b9; border-radius: 6px; padding: 20px; margin: 16px 0; background: #fffafa; }
+.video-delete-confirm h2 { font-size: 16px; margin-bottom: 10px; }
+.video-delete-confirm p { font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }

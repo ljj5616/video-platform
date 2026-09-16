@@ -1,0 +1,13 @@
+.edit-form-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.edit-preview { min-width: 0; }
+.edit-preview h2 { font-size: 13px; margin-bottom: 12px; }
+.edit-preview .player-shell { margin-bottom: 24px; }
+.edit-thumbnail-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.edit-thumbnail { width: 110px; aspect-ratio: 16 / 9; border: 1px solid #d9dde5; border-radius: 4px; background: #f3f4f6; display: grid; place-items: center; overflow: hidden; font-size: 11px; color: #737e90; }
+.edit-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.edit-thumbnail-button { position: relative; cursor: pointer; }
+.edit-thumbnail-button:focus-within { outline: 3px solid #5379bd; outline-offset: 3px; }
+.edit-actions { display: flex; gap: 12px; margin-top: 24px; }
+.edit-actions > .button { flex: 1; text-align: center; }
+.video-edit .upload-help { overflow-wrap: anywhere; }
+.edit-form-fields:disabled .button { opacity: .6; }

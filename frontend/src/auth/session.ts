@@ -1,6 +1,14 @@
 import { useSyncExternalStore } from 'react'
 
 export interface Session { accessToken: string; refreshToken: string; expiresAt: number }
+// Used only for displaying owner controls. The server validates ownership.
+export function sessionUserId(value: Session | null): number | undefined {
+  try {
+    const payload = value?.accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/') ?? ''
+    const id = Number(JSON.parse(atob(payload)).sub)
+    return Number.isSafeInteger(id) && id > 0 ? id : undefined
+  } catch { return undefined }
+}
 const storageKey = 'vidshare.session'
 function read(): Session | null {
   try {
@@ -33,11 +41,12 @@ export function useSession() {
 window.setInterval(() => { getSession() }, 1000)
 
 export async function authRequest<T>(path: string, method: string, body: unknown, token?: string): Promise<T> {
+  const multipart = body instanceof FormData
   const response = await fetch('/api/v1' + path, {
     method,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(15000),
+    headers: { ...(!multipart ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: multipart ? body : JSON.stringify(body),
+    signal: AbortSignal.timeout(multipart ? 120000 : 15000),
   })
   if (!response.ok) {
     const error = await response.json().catch(() => null) as { message?: string } | null

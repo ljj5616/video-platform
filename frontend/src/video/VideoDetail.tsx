@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { fromRecommendation, formatDuration, useApi } from '../api/videos'
 import type { RecommendationPage } from '../api/videos'
-import { authRequest, getSession, useSession } from '../auth/session'
+import { authRequest, getSession, sessionUserId, useSession } from '../auth/session'
 import { VideoPlayer } from './VideoPlayer'
 import './detail.css'
 
@@ -25,7 +25,7 @@ function State({ error, loading, retry, children }: { error?: string; loading: b
   return loading ? <p className="request-state" role="status">불러오는 중…</p> : error ? <p className="request-state" role="alert">{error} <button className="button" onClick={retry}>다시 시도</button></p> : children
 }
 
-export function VideoDetail({ id }: { id: string }) {
+export function VideoDetail({ id, onDeleted }: { id: string; onDeleted: () => void }) {
   const session = useSession()
   const detail = useApi<Detail>(`/api/v1/videos/${id}`, true)
   const related = useApi<RecommendationPage>('/api/v1/videos/recommendations?page=0&size=6')
@@ -39,9 +39,10 @@ export function VideoDetail({ id }: { id: string }) {
   const [editing, setEditing] = useState<number | null>(null)
   const [draft, setDraft] = useState('')
   const [deleting, setDeleting] = useState<number | null>(null)
-  // JWT subject is used only to display author controls; the server enforces ownership.
-  let userId: number | undefined
-  try { userId = Number(JSON.parse(atob(session?.accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/') ?? '')).sub) } catch { /* Guest */ }
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const mounted = useRef(true)
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
+  const userId = sessionUserId(session)
   async function mutate(path: string, method: string, body?: unknown, done?: () => void) {
     if (lock.current) return
     const current = getSession()
@@ -51,10 +52,10 @@ export function VideoDetail({ id }: { id: string }) {
     setMessage('')
     try {
       await authRequest(path, method, body, current.accessToken)
-      done?.()
+      if (mounted.current) done?.()
     } catch (cause) {
-      setMessage(cause instanceof Error && !['TypeError', 'TimeoutError'].includes(cause.name) ? cause.message : '서버에 연결하지 못했습니다. 다시 시도해 주세요.')
-    } finally { lock.current = false; setBusy(false) }
+      if (mounted.current) setMessage(cause instanceof Error && !['TypeError', 'TimeoutError'].includes(cause.name) ? cause.message : '서버에 연결하지 못했습니다. 다시 시도해 주세요.')
+    } finally { lock.current = false; if (mounted.current) setBusy(false) }
   }
   function submitComment(event: FormEvent) {
     event.preventDefault()
@@ -71,6 +72,14 @@ export function VideoDetail({ id }: { id: string }) {
         {video && <>
           <VideoPlayer id={id} poster={video.thumbnailUrl} />
           <h1 className="video-title">{video.title}</h1>
+          {session && userId === video.author.userId && <div className="video-owner-actions">
+            <button className="button" disabled={busy} onClick={() => { window.location.hash = `/videos/${id}/edit` }}>영상 수정</button>
+            <button className="button danger" disabled={busy} onClick={() => setConfirmDelete(true)}>영상 삭제</button>
+          </div>}
+          {session && userId === video.author.userId && confirmDelete && <section className="video-delete-confirm" aria-label="영상 삭제 확인">
+            <h2>이 영상을 삭제하시겠습니까?</h2><p>“{video.title}” 영상이 목록에서 제거되고 더 이상 시청할 수 없게 됩니다.</p>
+            <div className="form-actions"><button className="button" disabled={busy} onClick={() => setConfirmDelete(false)}>취소</button><button className="button danger" disabled={busy} onClick={() => void mutate(`/videos/${id}`, 'DELETE', undefined, () => { onDeleted(); window.location.hash = '/' })}>{busy ? '삭제 중…' : '삭제 확인'}</button></div>
+          </section>}
           <div className="video-meta">
             <div className="channel"><Avatar author={video.author} /><div><strong>{video.author.nickname}</strong><p>{video.categoryName}</p></div></div>
             <div className="video-actions">
