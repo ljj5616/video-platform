@@ -1,0 +1,43 @@
+.upload-layout { max-width: 1440px; margin: auto; padding: 32px 40px 64px; }
+.upload-layout h1 { font-size: 22px; margin-bottom: 24px; }
+.upload-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; align-items: start; }
+.upload-panel { border: 1px solid #d9dde5; border-radius: 7px; background: white; padding: 24px; }
+.upload-drop { position: relative; min-height: 360px; border: 1px dashed #ccd3df; background: white; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 12px; cursor: pointer; overflow-wrap: anywhere; min-width: 0; }
+.upload-drop strong { max-width: 100%; font-size: 14px; }
+.upload-drop > span:last-child { color: #727e90; font-size: 12px; }
+.upload-drop.dragging { border-color: #5379bd; background: #eef3fb; }
+.upload-icon { width: 48px; height: 48px; border-radius: 50%; background: #f3f4f6; display: grid; place-items: center; color: #566173; font-size: 28px; }
+.upload-file-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.upload-drop:focus-within, .upload-custom:focus-within { outline: 3px solid #5379bd; outline-offset: 3px; }
+.upload-fields { display: grid; gap: 16px; min-width: 0; }
+.upload-fields > label { display: grid; gap: 7px; font-size: 13px; font-weight: 600; }
+.upload-fields input:not([type=radio]), .upload-fields textarea, .upload-fields select { width: 100%; border: 1px solid #d9dde5; border-radius: 5px; padding: 10px; background: white; color: inherit; font: inherit; font-weight: 400; min-width: 0; }
+.upload-fields textarea { resize: vertical; min-height: 88px; }
+.upload-fields input::placeholder, .upload-fields textarea::placeholder { color: #8993a3; }
+.upload-visibility { border: 0; margin: 0; padding: 0; font-size: 13px; }
+.upload-visibility legend { font-weight: 600; margin-bottom: 8px; }
+.upload-visibility label { display: inline-flex; gap: 5px; align-items: center; margin-right: 18px; }
+.upload-visibility input { accent-color: #151c2b; margin: 0; }
+.upload-thumbnails { margin: 24px 0 20px; }
+.upload-thumbnails h2 { font-size: 14px; margin-bottom: 14px; }
+.upload-thumbnail-options { display: flex; gap: 14px; flex-wrap: wrap; }
+.upload-thumbnail { position: relative; width: 140px; aspect-ratio: 16 / 10; padding: 0; overflow: hidden; border: 1px solid #d9dde5; border-radius: 4px; background: #f3f4f6; display: grid; place-items: center; font-size: 11px; text-align: center; }
+.upload-thumbnail:disabled { color: #8791a0; }
+.upload-thumbnail[aria-pressed=true] { outline: 3px solid #151c2b; outline-offset: 2px; }
+.upload-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.upload-custom { background: white; border-style: dashed; cursor: pointer; }
+.upload-help { color: #737e90; font-size: 12px; line-height: 1.7; margin-top: 14px; }
+.upload-selection { margin-top: 12px; font-size: 12px; overflow-wrap: anywhere; }
+.upload-error { color: #a32424; padding: 12px 0; font-size: 14px; }
+.upload-wide { display: block; width: 100%; }
+.upload-wide:disabled { opacity: .5; }
+.upload-status-layout { padding: 64px 20px; }
+.upload-status { max-width: 460px; margin: 0 auto; }
+.upload-status h1 { font-size: 17px; margin-bottom: 10px; }
+.upload-status p { color: #707c8e; font-size: 13px; line-height: 1.8; margin-bottom: 16px; overflow-wrap: anywhere; }
+.upload-status progress { display: block; width: 100%; height: 8px; accent-color: #151c2b; }
+.upload-progress-label { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; margin: 8px 0 20px; }
+.upload-progress-label span { color: #737e90; }
+.upload-status-actions { display: flex; gap: 12px; }
+.upload-status-actions a { flex: 1; text-align: center; }
+@media (max-width: 720px) { .upload-layout { padding: 24px 20px 48px; } .upload-grid { grid-template-columns: 1fr; gap: 20px; } .upload-drop { min-height: 220px; } .upload-panel { padding: 20px; } .upload-thumbnail { width: calc(50% - 7px); } .upload-status-layout { padding-top: 36px; } }
