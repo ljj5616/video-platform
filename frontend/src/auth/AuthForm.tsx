@@ -66,6 +66,7 @@ export function AuthForm({ page, done }: { page: AuthPage; done: (message: strin
         <button className="button primary auth-submit" type="submit">{busy ? '처리 중…' : page === 'signup' ? '회원가입 완료' : page === 'withdraw' ? '회원탈퇴' : '로그인'}</button>
       </fieldset>
     </form>
+    {page === 'login' && <nav className="auth-footer" aria-label="계정 찾기"><a href="#/find-id">아이디 찾기</a> · <a href="#/password-reset">비밀번호 재설정</a></nav>}
     <div className="auth-footer">{page === 'login' ? <>계정이 없으신가요? <a href="#/signup">회원가입</a></> : page === 'signup' ? <>이미 계정이 있으신가요? <a href="#/login">로그인</a></> : <a href="#/">취소하고 홈으로</a>}</div>
   </section></main>
 }
