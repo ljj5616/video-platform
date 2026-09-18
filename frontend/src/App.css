@@ -47,3 +47,6 @@ button:not(:disabled):hover { filter: brightness(.94); }
 .thumbnail img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 .request-state { padding: 28px 12px; color: #606b7c; line-height: 1.8; }
 .request-state .button { margin-left: 12px; }
+.saved-navigation { margin-bottom: 24px; }
+.saved-count { margin-bottom: 20px; color: #606b7c; font-size: 14px; }
+.saved-page { align-self: center; font-size: 14px; }
