@@ -7,6 +7,10 @@ import com.example.videoplatform.video.entity.Video;
 import com.example.videoplatform.video.entity.VideoStatus;
 import com.example.videoplatform.video.entity.VideoVisibility;
 import com.example.videoplatform.video.repository.VideoRepository;
+import com.example.videoplatform.reaction.like.repository.VideoLikeRepository;
+import com.example.videoplatform.reaction.like.entity.VideoLikeId;
+import com.example.videoplatform.reaction.bookmark.repository.BookmarkRepository;
+import com.example.videoplatform.reaction.bookmark.entity.BookmarkId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class VideoDetailService {
 
     private final VideoRepository videoRepository;
+    private final VideoLikeRepository videoLikeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
-    public VideoDetailService(VideoRepository videoRepository) {
+    public VideoDetailService(VideoRepository videoRepository, VideoLikeRepository videoLikeRepository,
+                              BookmarkRepository bookmarkRepository) {
         this.videoRepository = videoRepository;
+        this.videoLikeRepository = videoLikeRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     @Transactional(readOnly = true)
@@ -28,7 +37,9 @@ public class VideoDetailService {
         if (!canView(userId, video)) {
             throw new BusinessException(ErrorCode.VIDEO_ACCESS_DENIED);
         }
-        return VideoDetailResponse.from(video);
+        return VideoDetailResponse.from(video,
+                userId != null && videoLikeRepository.existsById(new VideoLikeId(userId, videoId)),
+                userId != null && bookmarkRepository.existsById(new BookmarkId(userId, videoId)));
     }
 
     private long parseVideoId(String value) {

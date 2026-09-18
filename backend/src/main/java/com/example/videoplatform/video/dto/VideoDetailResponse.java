@@ -14,9 +14,12 @@ public record VideoDetailResponse(
         String categoryName,
         VideoAuthorResponse author,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Long likeCount,
+        boolean liked,
+        boolean bookmarked
 ) {
-    public static VideoDetailResponse from(Video video) {
+    public static VideoDetailResponse from(Video video, boolean liked, boolean bookmarked) {
         return new VideoDetailResponse(
                 video.getId(),
                 video.getTitle(),
@@ -28,7 +31,10 @@ public record VideoDetailResponse(
                 video.getCategory().getName(),
                 VideoAuthorResponse.from(video.getUploader()),
                 video.getCreatedAt(),
-                video.getUpdatedAt()
+                video.getUpdatedAt(),
+                video.getLikeCount(),
+                liked,
+                bookmarked
         );
     }
 }
