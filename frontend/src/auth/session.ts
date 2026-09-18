@@ -40,10 +40,11 @@ export function useSession() {
 }
 window.setInterval(() => { getSession() }, 1000)
 
-export async function authRequest<T>(path: string, method: string, body: unknown, token?: string): Promise<T> {
+export async function authRequest<T>(path: string, method: string, body: unknown, token?: string, keepalive = false): Promise<T> {
   const multipart = body instanceof FormData
   const response = await fetch('/api/v1' + path, {
     method,
+    keepalive,
     headers: { ...(!multipart ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: 'Bearer ' + token } : {}) },
     body: multipart ? body : JSON.stringify(body),
     signal: AbortSignal.timeout(multipart ? 120000 : 15000),

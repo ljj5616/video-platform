@@ -4,7 +4,7 @@ import type { Video } from '../api/videos'
 
 const viewFormatter = new Intl.NumberFormat('ko-KR', { notation: 'compact', maximumFractionDigits: 1 })
 
-export function VideoCard({ video }: { video: Video }) {
+export function VideoCard({ video }: { video: Omit<Video, 'views'> & { views?: number } }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
   return <article className="video-card"><a href={`#/videos/${video.id}`}>
     <div className="thumbnail" aria-label={video.title + ' 썸네일'}>
@@ -13,7 +13,7 @@ export function VideoCard({ video }: { video: Video }) {
     </div>
     <h3>{video.title}</h3>
     <p className="author">{video.author}</p>
-    <p className="views">조회수 {viewFormatter.format(video.views)}회</p>
+    {video.views !== undefined && <p className="views">조회수 {viewFormatter.format(video.views)}회</p>}
   </a></article>
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Hls from 'hls.js'
 import { useApi } from '../api/videos'
 import { authRequest, getSession } from '../auth/session'
+import { useWatchProgress } from './useWatchProgress'
 
 interface Playback { playbackUrl: string; mediaType: string; duration: number }
 
@@ -17,6 +18,7 @@ export function VideoPlayer({ id, poster }: { id: string; poster?: string | null
 
 function Player({ id, source, poster, retry }: { id: string; source: Playback; poster?: string | null; retry: () => void }) {
   const ref = useRef<HTMLVideoElement>(null)
+  const progressError = useWatchProgress(ref, id, source.duration)
   const recorded = useRef(false)
   const [error, setError] = useState('')
   useEffect(() => {
@@ -44,5 +46,6 @@ function Player({ id, source, poster, retry }: { id: string; source: Playback; p
     <video ref={ref} controls playsInline preload="metadata" poster={poster ?? undefined} onPlaying={recordView}
       onError={() => setError('영상을 재생하지 못했습니다. 다시 시도해 주세요.')} />
     {error && <p className="request-state" role="alert">{error} <button className="button" onClick={retry}>다시 시도</button></p>}
+    {progressError && <p className="request-state" role="status">{progressError}</p>}
   </>
 }
