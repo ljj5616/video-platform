@@ -10,6 +10,8 @@
 .field-help { font-size: 12px; color: #606b7c; margin: -8px 0 18px; }
 .auth-footer { border-top: 1px solid #e7e9ee; margin-top: 24px; padding-top: 16px; text-align: center; font-size: 13px; }
 .auth-footer a { font-weight: 700; text-decoration: underline; }
+.recovery-notice, .recovery-result { font-size: 14px; line-height: 1.7; margin-bottom: 20px; overflow-wrap: anywhere; }
+.recovery-result strong { display: block; margin: 16px 0; font-size: 20px; }
 .withdraw-warning { line-height: 1.7; margin-bottom: 24px; color: #a02332; font-size: 14px; }
 .auth-card .confirmation { display: flex; align-items: center; gap: 8px; line-height: 1.6; }
 .account-menu { position: relative; }
